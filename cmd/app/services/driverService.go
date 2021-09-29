@@ -2,12 +2,15 @@ package services
 
 import (
 	"daitan-dispatch-system/cmd/app/models"
+	"daitan-dispatch-system/cmd/app/repositories"
+	"fmt"
 	"sync"
 
 	"github.com/google/uuid"
 )
 
 type DriverService struct {
+	driverRepo repositories.DriverRepository
 }
 
 var driverInstance *DriverService
@@ -16,27 +19,17 @@ var driverOnce sync.Once
 func GetDriverService() *DriverService {
 	driverOnce.Do(func() {
 		driverInstance = &DriverService{}
+		driverInstance.driverRepo.Init()
+		go driverInstance.handleDriverRepositoryResponse()
 	})
 
 	return driverInstance
 }
 
-func (t *DriverService) AddNewDriver(driver *models.Driver) (models.Driver, error) {
+func (t *DriverService) AddNewDriver(driver *models.DriverInfo) (models.DriverInfo, error) {
 
-	return models.Driver{
+	return models.DriverInfo{
 		Uuid:    uuid.New().String(),
-		Name:    "",
-		Ranking: 0,
-		Trips:   0,
-		Car:     models.Car{},
-		Status:  0,
-	}, nil
-}
-
-func (t *DriverService) FindDriver(uuid string) (models.Driver, error) {
-
-	return models.Driver{
-		Uuid:    uuid,
 		Name:    "",
 		Ranking: 0,
 		Trips:   0,
@@ -53,9 +46,9 @@ func (t *DriverService) AddNewLocation(uuid string, driver *models.Location) (mo
 	}, nil
 }
 
-func (t *DriverService) UpdateDriverStatus(uuid string, driver *models.DriverStatus) (models.Driver, error) {
+func (t *DriverService) UpdateDriverStatus(uuid string, driver *models.DriverStatus) (models.DriverInfo, error) {
 
-	return models.Driver{
+	return models.DriverInfo{
 		Uuid:    "",
 		Name:    "",
 		Ranking: 0,
@@ -63,4 +56,36 @@ func (t *DriverService) UpdateDriverStatus(uuid string, driver *models.DriverSta
 		Car:     models.Car{},
 		Status:  0,
 	}, nil
+}
+
+func (t *DriverService) NewTripRequest(req *models.TripRequest) {
+	req.Uuid = uuid.New().String()
+	t.driverRepo.NewRequest(req)
+}
+
+func (t *DriverService) NewDriverInfo(info *models.DriverInfo) {
+	t.driverRepo.NewRequest(info)
+}
+
+func (t *DriverService) NewDriverUpdate(update *models.DriverUpdate) {
+	t.driverRepo.NewRequest(update)
+}
+
+func (t *DriverService) NewDriverQuery(query *models.QueryRequest) {
+	t.driverRepo.NewRequest(query)
+}
+
+func (t *DriverService) handleDriverRepositoryResponse() {
+	for res := range t.driverRepo.ResponseCh {
+		switch res.(type) {
+		case *models.Driver:
+			fmt.Printf("[DriverService.manageDriverRepository] Driver response=%s\n", res)
+		default:
+			panic("[DriverService.manageDriverRepository] Unrecognized type")
+		}
+	}
+}
+
+func (t *DriverService) Shutdown() {
+	t.driverRepo.Shutdown()
 }

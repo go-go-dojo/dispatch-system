@@ -11,12 +11,11 @@ const (
 	Cancel
 )
 
-type DriverStatus int
+type QueryType int
 
 const (
-	DRiVER_AVAILABLE = 1
-	DRiVER_ON_TRIP
-	DRiVER_UNAVAILABLE
+	DRIVERINFO = iota
+	TRIP
 )
 
 type Location struct {
@@ -34,14 +33,13 @@ type Car struct {
 	Model       string `json:"model"`
 }
 
-type Driver struct {
-	Uuid     string  `json:"uuid"`
-	Name     string  `json:"name"`
-	Ranking  float64 `json:"ranking"`
-	Trips    int     `json:"trips"`
-	Car      Car
-	Status   DriverStatus
-	Location Location
+func (c Car) String() string {
+	return fmt.Sprintf("<Car> Plate=%s; Brand=%s; Model=%s", c.PlateNumber, c.Brand, c.Model)
+}
+
+type QueryRequest struct {
+	Uuid string
+	Type QueryType
 }
 
 type TripRequest struct {
@@ -52,16 +50,16 @@ type TripRequest struct {
 }
 
 func (tr TripRequest) String() string {
-	return fmt.Sprintf("Location=%s, id=%s, Status=%d", tr.Location, tr.Uuid, tr.Status)
+	return fmt.Sprintf("<TripRequest> Location=%s, id=%s, Status=%d", tr.Location, tr.Uuid, tr.Status)
 }
 
 type Trip struct {
 	Location Location
 	Uuid     string `json:"uuid"`
 	Status   Status
-	Driver   Driver
+	Driver   DriverInfo
 }
 
 func (t Trip) String() string {
-	return fmt.Sprintf("Location=%s; id=%s; Status=%d; Driver=%s\n", t.Location, t.Uuid, t.Status, t.Driver.Name)
+	return fmt.Sprintf("<Trip> Location=%s; id=%s; Status=%d; DriverInfo=%s\n", t.Location, t.Uuid, t.Status, t.Driver.Name)
 }
