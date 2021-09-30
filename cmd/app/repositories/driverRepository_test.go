@@ -18,39 +18,35 @@ func TestDriverRepository_ProcessDriverInfo(t *testing.T) {
 	}
 
 	mapa := make(map[string]*models.DriverInfo)
-	mapa["717995b2-978b-4351-9050-873be05e014c"] = &d
 
 	type fields struct {
-		drivers    map[string]*models.DriverInfo
-		requestCh  chan interface{}
-		ResponseCh chan interface{}
+		drivers map[string]*models.DriverInfo
 	}
-
 	type args struct {
 		newDriver *models.DriverInfo
 	}
-	tests := []struct {
+
+	tests := struct {
 		name   string
 		fields fields
 		args   args
 	}{
-		{
-			name: "processDriverInfoSuccessTest",
-			fields: fields{
-				drivers:    mapa,
-				requestCh:  nil,
-				ResponseCh: nil,
-			},
-			args: args{},
+		name: "processDriverInfoSuccessTest",
+		fields: fields{
+			drivers: mapa,
 		},
+		args: args{},
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			s := &DriverRepository{
-				drivers:    tt.fields.drivers,
-				requestCh:  tt.fields.requestCh,
-				ResponseCh: tt.fields.ResponseCh,
-			}
-		})
+
+	s := &DriverRepository{
+		drivers: tests.fields.drivers,
+	}
+	s.ProcessDriverInfo(&d)
+	if got, ok := s.drivers["717995b2-978b-4351-9050-873be05e014c"]; ok {
+		if *got != d {
+			t.Errorf("Drivers are not the same")
+		}
+	} else {
+		t.Errorf("Driver not in map")
 	}
 }
