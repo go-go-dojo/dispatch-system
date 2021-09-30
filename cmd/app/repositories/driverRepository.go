@@ -30,10 +30,6 @@ func (s *DriverRepository) Shutdown() {
 	close(s.ResponseCh)
 }
 
-func (s *DriverRepository) AddDriver(driver *models.DriverInfo) {
-	s.drivers[driver.Uuid] = driver
-}
-
 func (s *DriverRepository) NewRequest(obj interface{}) {
 	s.requestCh <- obj
 }
