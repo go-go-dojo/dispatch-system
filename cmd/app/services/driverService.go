@@ -78,7 +78,7 @@ func (t *DriverService) NewDriverQuery(query *models.QueryRequest) {
 func (t *DriverService) handleDriverRepositoryResponse() {
 	for res := range t.driverRepo.ResponseCh {
 		switch res.(type) {
-		case *models.Driver:
+		case *models.DriverInfo:
 			fmt.Printf("[DriverService.manageDriverRepository] Driver response=%s\n", res)
 		default:
 			panic("[DriverService.manageDriverRepository] Unrecognized type")
