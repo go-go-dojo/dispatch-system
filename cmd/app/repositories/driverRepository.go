@@ -73,12 +73,13 @@ func (s *DriverRepository) ProcessDriverUpdate(update *models.DriverUpdate) {
 	}
 }
 
-func (s *DriverRepository) ProcessDriverInfo(newDriver *models.DriverInfo) {
+func (s *DriverRepository) ProcessDriverInfo(newDriver *models.DriverInfo) *models.DriverInfo {
 
 	if driver, ok := s.drivers[newDriver.Uuid]; ok && (newDriver.Uuid != "") {
 		// Due to this simplification, new drivers are able to override other driver's information
 		driver = newDriver
 		fmt.Printf("[DriverRepository.ProcessDriverInfo] DriverInfo updated, %s\n", *driver)
+		return driver
 	} else {
 		// New driver, generate unique id
 		if newDriver.Uuid == "" {
@@ -86,6 +87,7 @@ func (s *DriverRepository) ProcessDriverInfo(newDriver *models.DriverInfo) {
 		}
 		s.drivers[newDriver.Uuid] = newDriver
 		fmt.Printf("[DriverRepository.ProcessDriverInfo] New driver registered, %s\n", *s.drivers[newDriver.Uuid])
+		return s.drivers[newDriver.Uuid]
 	}
 }
 
