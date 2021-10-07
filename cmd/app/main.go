@@ -42,6 +42,7 @@ func main() {
 
 	info.Printf("Starting server on %s", serverURI)
 	err := srv.ListenAndServe()
-	services.GetInstance().Shutdown()
+	services.GetDriverService().Shutdown()
+
 	error.Fatal(err)
 }
