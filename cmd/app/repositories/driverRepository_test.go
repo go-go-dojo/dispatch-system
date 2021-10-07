@@ -2,14 +2,15 @@ package repositories
 
 import (
 	"daitan-dispatch-system/cmd/app/models"
+	"fmt"
 	"testing"
 )
 
 func TestDriverRepository_ProcessDriverInfo(t *testing.T) {
 
-	drivers := []models.DriverInfo{
+	drivers := []*models.DriverInfo{
 		{
-			Uuid:     "1",
+			Uuid:     "717995b2-978b",
 			Name:     "Luiz Henrique",
 			Ranking:  0.5,
 			Trips:    1,
@@ -18,7 +19,7 @@ func TestDriverRepository_ProcessDriverInfo(t *testing.T) {
 			Location: models.Location{},
 		},
 		{
-			Uuid:     "1",
+			Uuid:     "717995b2-978b",
 			Name:     "Andre Carneiro",
 			Ranking:  0.5,
 			Trips:    1,
@@ -43,19 +44,20 @@ func TestDriverRepository_ProcessDriverInfo(t *testing.T) {
 	}
 
 	for _, driver := range drivers {
-		s.ProcessDriverInfo(&driver)
-
-
-
-
-
+		s.ProcessDriverInfo(driver)
 	}
 
-	if got, ok := s.drivers["717995b2-978b-4351-9050-873be05e014c"]; ok {
-		if *got != d {
-			t.Errorf("Drivers are not the same")
+	if d, ok := s.drivers["717995b2-978b"]; ok {
+		fmt.Println(d.Name)
+		if d.Name != "Andre Carneiro" {
+			t.Errorf("The driver wasn't update")
 		}
 	} else {
-		t.Errorf("Driver not in map")
+		t.Errorf("Driver not found")
+	}
+
+	size := len(s.drivers)
+	if size != 2 {
+		t.Errorf("")
 	}
 }
