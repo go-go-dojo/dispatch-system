@@ -74,11 +74,74 @@ func TestDriverRepository_ProcessDriverInfo(t *testing.T) {
 		if key != driver.Uuid {
 			t.Errorf("Inconsistent key ")
 		}
-
 	}
 
 	size := len(s.drivers)
 	if size != 2 {
-		t.Errorf("")
+		t.Errorf("Should have 2 drivers")
+	}
+}
+
+func TestDriverRepository_ProcessTripRequest(t *testing.T) {
+
+	requests := []*models.TripRequest{{
+		Datetime: "",
+		Location: models.Location{
+			Latitude:  0,
+			Longitude: 0,
+		},
+		Uuid:   "",
+		Status: 0,
+	}}
+
+	for _, req := range requests {
+		s.ProcessTripRequest(req)
+	}
+}
+
+func setup() *DriverRepository {
+
+	driverMap := make(map[string]*models.DriverInfo)
+
+	s := &DriverRepository{
+		drivers: driverMap,
+	}
+
+	return s
+}
+
+func createMockDrivers(repo *DriverRepository) {
+
+	drivers := []*models.DriverInfo{
+		{
+			Uuid:     "",
+			Name:     "Luiz Henrique",
+			Ranking:  0.5,
+			Trips:    1,
+			Car:      models.Car{},
+			Status:   models.AVAILABLE,
+			Location: models.Location{},
+		},
+		{
+			Uuid:     "",
+			Name:     "Andre Carneiro Fake",
+			Ranking:  0.5,
+			Trips:    1,
+			Car:      models.Car{},
+			Status:   models.ON_TRIP,
+			Location: models.Location{},
+		},
+		{
+			Uuid:     "",
+			Name:     "Andre Carneiro Fake",
+			Ranking:  0.5,
+			Trips:    1,
+			Car:      models.Car{},
+			Status:   models.AWAY,
+			Location: models.Location{},
+		}}
+
+	for _, driver := range drivers {
+		repo.ProcessDriverInfo(driver)
 	}
 }
