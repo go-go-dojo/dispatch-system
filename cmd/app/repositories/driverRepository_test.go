@@ -82,7 +82,7 @@ func TestDriverRepository_ProcessDriverInfo(t *testing.T) {
 	}
 }
 
-func TestDriverRepository_ProcessTripRequest(t *testing.T) {
+func TestDriverRepository_ProcessTripRequestEmptyDriver(t *testing.T) {
 
 	requests := []*models.TripRequest{{
 		Datetime: "",
@@ -94,9 +94,17 @@ func TestDriverRepository_ProcessTripRequest(t *testing.T) {
 		Status: 0,
 	}}
 
+	s := new(DriverRepository)
+	s.Init()
+
 	for _, req := range requests {
-		s.ProcessTripRequest(req)
+		result := s.ProcessTripRequest(req)
+
+		if result == nil {
+			t.Fatalf("Expected nil but came %v", result.Error())
+		}
 	}
+
 }
 
 func setup() *DriverRepository {
@@ -108,6 +116,10 @@ func setup() *DriverRepository {
 	}
 
 	return s
+}
+
+func (r *DriverRepository) teardown() {
+	r.drivers = make(map[string]*models.DriverInfo)
 }
 
 func createMockDrivers(repo *DriverRepository) {

@@ -3,6 +3,7 @@ package repositories
 import (
 	"daitan-dispatch-system/cmd/app/models"
 	"daitan-dispatch-system/cmd/app/utils"
+	"errors"
 	"fmt"
 	"github.com/google/uuid"
 )
@@ -89,7 +90,7 @@ func (s *DriverRepository) ProcessDriverInfo(newDriver *models.DriverInfo) {
 	}
 }
 
-func (s *DriverRepository) ProcessTripRequest(req *models.TripRequest) {
+func (s *DriverRepository) ProcessTripRequest(req *models.TripRequest) error {
 
 	var dist, lowestDist float64
 	var closestDriver *models.DriverInfo
@@ -112,7 +113,8 @@ func (s *DriverRepository) ProcessTripRequest(req *models.TripRequest) {
 		fmt.Printf("[DriverRepository.ProcessTripRequest] Found driver=%s at distance=%.2f for request=%s\n", *closestDriver, lowestDist, *req)
 		closestDriver.Status = models.ON_TRIP
 		s.ResponseCh <- closestDriver
+		return nil
 	} else {
-		fmt.Printf("[DriverRepository.ProcessTripRequest] Could not find an available driver for request=%s\n", *req)
+		return errors.New("drivers unavailable")
 	}
 }
