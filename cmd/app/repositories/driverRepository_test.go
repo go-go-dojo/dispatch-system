@@ -20,6 +20,15 @@ func TestDriverRepository_ProcessDriverInfo(t *testing.T) {
 		},
 		{
 			Uuid:     "717995b2-978b",
+			Name:     "Andre Carneiro Fake",
+			Ranking:  0.5,
+			Trips:    1,
+			Car:      models.Car{},
+			Status:   0,
+			Location: models.Location{},
+		},
+		{
+			Uuid:     "717995b2-978b",
 			Name:     "Andre Carneiro",
 			Ranking:  0.5,
 			Trips:    1,
@@ -54,6 +63,18 @@ func TestDriverRepository_ProcessDriverInfo(t *testing.T) {
 		}
 	} else {
 		t.Errorf("Driver not found")
+	}
+
+	for key, driver := range s.drivers {
+
+		if key == "" || driver.Uuid == "" {
+			t.Errorf("Undefined key")
+		}
+
+		if key != driver.Uuid {
+			t.Errorf("Inconsistent key ")
+		}
+
 	}
 
 	size := len(s.drivers)
