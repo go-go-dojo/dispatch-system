@@ -91,7 +91,36 @@ func (s *DriverRepository) ProcessDriverInfo(newDriver *models.DriverInfo) {
 	}
 }
 
-func (s *DriverRepository) ProcessTripRequest(req *models.TripRequest) error {
+func (s *DriverRepository) ProcessTripRequest(req *models.TripRequest) (*models.DriverInfo, error) {
+
+	var dist, lowestDist float64
+	var closestDriver *models.DriverInfo
+
+	// TODO: Use a parallel for loop to find the closest driver
+	first := true
+	for _, driver := range s.drivers {
+		if driver.IsAvailable() {
+			dist = utils.DistanceBetween(req.Location, driver.Location)
+			fmt.Printf("[DriverRepo.ProcessTripRequest] Assessing distance=%.3f, driver=%s\n", dist, *driver)
+			if dist < lowestDist || first {
+				first = false
+				lowestDist = dist
+				closestDriver = driver
+			}
+		}
+	}
+
+	if closestDriver != nil {
+		fmt.Printf("[DriverRepository.ProcessTripRequest] Found driver=%s at distance=%.2f for request=%s\n", *closestDriver, lowestDist, *req)
+		closestDriver.Status = models.ON_TRIP
+		s.ResponseCh <- closestDriver
+		return nil
+	} else {
+		return errors.New("drivers unavailable")
+	}
+}
+
+func (s *DriverRepository) findDriverBy(req *models.TripRequest) error {
 
 	var dist, lowestDist float64
 	var closestDriver *models.DriverInfo

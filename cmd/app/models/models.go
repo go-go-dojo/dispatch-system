@@ -49,6 +49,13 @@ type TripRequest struct {
 	Status   Status
 }
 
+type TripResponse struct {
+	TripRequest TripRequest
+	Driver      DriverInfo
+	Uuid        string `json:"uuid"`
+	Status      Status
+}
+
 func (tr TripRequest) String() string {
 	return fmt.Sprintf("<TripRequest> Location=%s, id=%s, Status=%d", tr.Location, tr.Uuid, tr.Status)
 }
