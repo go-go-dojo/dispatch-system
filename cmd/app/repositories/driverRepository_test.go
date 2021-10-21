@@ -98,10 +98,10 @@ func TestDriverRepository_ProcessTripRequestEmptyDriver(t *testing.T) {
 	s.Init()
 
 	for _, req := range requests {
-		err := s.ProcessTripRequest(req)
+		_, err := s.ProcessTripRequest(req)
 
-		if err != nil {
-			t.Fatalf("Expected nil but came %v", err.Error())
+		if err == nil {
+			t.Fatalf("Error expected because there are not drivers")
 		}
 	}
 	s.Shutdown()
@@ -146,8 +146,8 @@ func TestDriverRepository_ProcessTripRequest(t *testing.T) {
 		Car:     models.Car{},
 		Status:  models.AVAILABLE,
 		Location: models.Location{
-			Latitude:  1,
-			Longitude: 1,
+			Latitude:  0.6,
+			Longitude: 0.6,
 		},
 	}, {
 		Uuid:    "",
@@ -162,6 +162,8 @@ func TestDriverRepository_ProcessTripRequest(t *testing.T) {
 		},
 	}}
 
+	var closestDrivers []*models.DriverInfo
+
 	s := new(DriverRepository)
 	s.Init()
 
@@ -169,16 +171,15 @@ func TestDriverRepository_ProcessTripRequest(t *testing.T) {
 		s.ProcessDriverInfo(info)
 	}
 	for _, req := range requests {
-		s.ProcessTripRequest(req)
-	}
-
-	for _, req := range requests {
-		err := s.ProcessTripRequest(req)
-
-		if err != nil {
-			t.Fatalf("Expected nil but came %v", err.Error())
+		if d, err := s.ProcessTripRequest(req); err == nil {
+			closestDrivers = append(closestDrivers, d)
 		}
 	}
+
+	for _, d := range closestDrivers {
+		fmt.Println(d.String())
+	}
+
 	s.Shutdown()
 }
 

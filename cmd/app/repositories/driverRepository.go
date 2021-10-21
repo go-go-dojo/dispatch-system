@@ -92,7 +92,6 @@ func (s *DriverRepository) ProcessDriverInfo(newDriver *models.DriverInfo) {
 }
 
 func (s *DriverRepository) ProcessTripRequest(req *models.TripRequest) (*models.DriverInfo, error) {
-
 	var dist, lowestDist float64
 	var closestDriver *models.DriverInfo
 
@@ -112,11 +111,9 @@ func (s *DriverRepository) ProcessTripRequest(req *models.TripRequest) (*models.
 
 	if closestDriver != nil {
 		fmt.Printf("[DriverRepository.ProcessTripRequest] Found driver=%s at distance=%.2f for request=%s\n", *closestDriver, lowestDist, *req)
-		closestDriver.Status = models.ON_TRIP
-		s.ResponseCh <- closestDriver
-		return nil
+		return closestDriver, nil
 	} else {
-		return errors.New("drivers unavailable")
+		return nil, errors.New("drivers unavailable")
 	}
 }
 
