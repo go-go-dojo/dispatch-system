@@ -98,13 +98,88 @@ func TestDriverRepository_ProcessTripRequestEmptyDriver(t *testing.T) {
 	s.Init()
 
 	for _, req := range requests {
-		result := s.ProcessTripRequest(req)
+		err := s.ProcessTripRequest(req)
 
-		if result == nil {
-			t.Fatalf("Expected nil but came %v", result.Error())
+		if err != nil {
+			t.Fatalf("Expected nil but came %v", err.Error())
 		}
 	}
+	s.Shutdown()
+}
 
+func TestDriverRepository_ProcessTripRequest(t *testing.T) {
+
+	requests := []*models.TripRequest{{
+		Datetime: "",
+		Location: models.Location{
+			Latitude:  0.1,
+			Longitude: 0.1,
+		},
+		Uuid:   "",
+		Status: 0,
+	}, {
+		Datetime: "",
+		Location: models.Location{
+			Latitude:  0.5,
+			Longitude: 0.5,
+		},
+		Uuid:   "",
+		Status: 0,
+	}}
+
+	drivers := []*models.DriverInfo{{
+		Uuid:    "",
+		Name:    "",
+		Ranking: 0,
+		Trips:   0,
+		Car:     models.Car{},
+		Status:  models.AVAILABLE,
+		Location: models.Location{
+			Latitude:  0,
+			Longitude: 0,
+		},
+	}, {
+		Uuid:    "",
+		Name:    "",
+		Ranking: 0,
+		Trips:   0,
+		Car:     models.Car{},
+		Status:  models.AVAILABLE,
+		Location: models.Location{
+			Latitude:  1,
+			Longitude: 1,
+		},
+	}, {
+		Uuid:    "",
+		Name:    "",
+		Ranking: 0,
+		Trips:   0,
+		Car:     models.Car{},
+		Status:  models.ON_TRIP,
+		Location: models.Location{
+			Latitude:  0.1,
+			Longitude: 0.1,
+		},
+	}}
+
+	s := new(DriverRepository)
+	s.Init()
+
+	for _, info := range drivers {
+		s.ProcessDriverInfo(info)
+	}
+	for _, req := range requests {
+		s.ProcessTripRequest(req)
+	}
+
+	for _, req := range requests {
+		err := s.ProcessTripRequest(req)
+
+		if err != nil {
+			t.Fatalf("Expected nil but came %v", err.Error())
+		}
+	}
+	s.Shutdown()
 }
 
 func setup() *DriverRepository {
@@ -118,8 +193,8 @@ func setup() *DriverRepository {
 	return s
 }
 
-func (r *DriverRepository) teardown() {
-	r.drivers = make(map[string]*models.DriverInfo)
+func (s *DriverRepository) teardown() {
+	s.drivers = make(map[string]*models.DriverInfo)
 }
 
 func createMockDrivers(repo *DriverRepository) {

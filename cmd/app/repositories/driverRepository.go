@@ -41,6 +41,7 @@ func (s *DriverRepository) handleRequestChannel() {
 		case *models.TripRequest:
 			// Find trip
 			s.ProcessTripRequest(req.(*models.TripRequest))
+			// Take result and insert into channel
 		case *models.DriverInfo:
 			// Update or add driver
 			s.ProcessDriverInfo(req.(*models.DriverInfo))
