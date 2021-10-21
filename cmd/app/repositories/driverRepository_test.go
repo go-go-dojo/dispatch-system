@@ -128,8 +128,8 @@ func TestDriverRepository_ProcessTripRequest(t *testing.T) {
 	}}
 
 	drivers := []*models.DriverInfo{{
-		Uuid:    "",
-		Name:    "",
+		Uuid:    "f025aff2-0a8e-496c-9722-0612fb35987b",
+		Name:    "Eder Souza",
 		Ranking: 0,
 		Trips:   0,
 		Car:     models.Car{},
@@ -139,8 +139,8 @@ func TestDriverRepository_ProcessTripRequest(t *testing.T) {
 			Longitude: 0,
 		},
 	}, {
-		Uuid:    "",
-		Name:    "",
+		Uuid:    "ec558937-9aba-4463-b371-778e8f4bde7d",
+		Name:    "Alioth Latour",
 		Ranking: 0,
 		Trips:   0,
 		Car:     models.Car{},
@@ -150,8 +150,8 @@ func TestDriverRepository_ProcessTripRequest(t *testing.T) {
 			Longitude: 0.6,
 		},
 	}, {
-		Uuid:    "",
-		Name:    "",
+		Uuid:    "4a0bf4f1-65d2-40e6-83a2-fbdeef992216",
+		Name:    "Alexandre",
 		Ranking: 0,
 		Trips:   0,
 		Car:     models.Car{},
@@ -170,13 +170,23 @@ func TestDriverRepository_ProcessTripRequest(t *testing.T) {
 	for _, info := range drivers {
 		s.ProcessDriverInfo(info)
 	}
+
 	for _, req := range requests {
 		if d, err := s.ProcessTripRequest(req); err == nil {
 			closestDrivers = append(closestDrivers, d)
 		}
 	}
 
-	for _, d := range closestDrivers {
+	if len(closestDrivers) != 2 {
+		t.Fatalf("Error expected because there are not drivers")
+	}
+
+	for i, d := range closestDrivers {
+		if i == 0 && d.Uuid != "f025aff2-0a8e-496c-9722-0612fb35987b" {
+			t.Fatalf("Error expected because there are not drivers")
+		} else if i == 1 && d.Uuid != "ec558937-9aba-4463-b371-778e8f4bde7d" {
+			t.Fatalf("Error expected because there are not drivers")
+		}
 		fmt.Println(d.String())
 	}
 
