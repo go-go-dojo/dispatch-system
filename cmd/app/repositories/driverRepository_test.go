@@ -190,6 +190,12 @@ func TestDriverRepository_ProcessTripRequest(t *testing.T) {
 		fmt.Println(d.String())
 	}
 
+	if len(closestDrivers) > 0 {
+		if closestDrivers[0].Uuid != "f025aff2-0a8e-496c-9722-0612fb35987b" {
+			t.Fatalf("Error: expected value 'f025aff2-0a8e-496c-9722-0612fb35987b' current value '%s'", closestDrivers[0].Uuid)
+		}
+	}
+
 	s.Shutdown()
 }
 
