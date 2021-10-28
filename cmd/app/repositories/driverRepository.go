@@ -40,7 +40,10 @@ func (s *DriverRepository) handleRequestChannel() {
 		switch req.(type) {
 		case *models.TripRequest:
 			// Find trip
-			s.ProcessTripRequest(req.(*models.TripRequest))
+			driver, err := s.ProcessTripRequest(req.(*models.TripRequest))
+			if (driver != nil) || (err != nil) {
+				s.ResponseCh <- driver
+			}
 			// Take result and insert into channel
 		case *models.DriverInfo:
 			// Update or add driver

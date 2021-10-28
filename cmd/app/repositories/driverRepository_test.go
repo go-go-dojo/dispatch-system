@@ -1,9 +1,12 @@
 package repositories
 
 import (
-	"daitan-dispatch-system/cmd/app/models"
 	"fmt"
 	"testing"
+
+	"github.com/stretchr/testify/require"
+
+	"daitan-dispatch-system/cmd/app/models"
 )
 
 func TestDriverRepository_ProcessDriverInfo(t *testing.T) {
@@ -109,6 +112,8 @@ func TestDriverRepository_ProcessTripRequestEmptyDriver(t *testing.T) {
 
 func TestDriverRepository_ProcessTripRequest(t *testing.T) {
 
+	r := require.New(t)
+
 	requests := []*models.TripRequest{{
 		Datetime: "",
 		Location: models.Location{
@@ -177,25 +182,9 @@ func TestDriverRepository_ProcessTripRequest(t *testing.T) {
 		}
 	}
 
-	if len(closestDrivers) != 2 {
-		t.Fatalf("Error expected because there are not drivers")
-	}
-
-	for i, d := range closestDrivers {
-		if i == 0 && d.Uuid != "f025aff2-0a8e-496c-9722-0612fb35987b" {
-			t.Fatalf("Error expected because there are not drivers")
-		} else if i == 1 && d.Uuid != "ec558937-9aba-4463-b371-778e8f4bde7d" {
-			t.Fatalf("Error expected because there are not drivers")
-		}
-		fmt.Println(d.String())
-	}
-
-	if len(closestDrivers) > 0 {
-		if closestDrivers[0].Uuid != "f025aff2-0a8e-496c-9722-0612fb35987b" {
-			t.Fatalf("Error: expected value 'f025aff2-0a8e-496c-9722-0612fb35987b' current value '%s'", closestDrivers[0].Uuid)
-		}
-	}
-
+	r.Len(closestDrivers, 2)
+	r.Equal("f025aff2-0a8e-496c-9722-0612fb35987b", closestDrivers[0].Uuid)
+	r.Equal("ec558937-9aba-4463-b371-778e8f4bde7d", closestDrivers[1].Uuid)
 	s.Shutdown()
 }
 
