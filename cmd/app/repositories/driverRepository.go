@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"daitan-dispatch-system/cmd/app/models"
+	"daitan-dispatch-system/cmd/app/services"
 	"daitan-dispatch-system/cmd/app/utils"
 	"errors"
 	"fmt"
@@ -9,10 +10,22 @@ import (
 	"reflect"
 )
 
+type IService interface {
+	ProcessPayload(payload interface{})
+}
+
+type TripRequest struct {
+
+}
+
+func (t *TripRequest) ProcessPayload(payload interface{}) {
+	// algo
+}
+
 type DriverRepository struct {
 	drivers map[string]*models.DriverInfo
 
-	handles map[reflect.Type]*models.DriverInfo
+	handles map[services.Message]IService
 
 	requestCh  chan interface{}
 	ResponseCh chan interface{}
@@ -63,6 +76,9 @@ func (s *DriverRepository) handleRequestChannel() {
 			panic("[DriverRepository.handleRequestChannel] Unrecognized type")
 		}
 	}
+
+	map[reflect.TypeOf(req.service)].func(req.payload)
+	s.
 }
 
 func (s *DriverRepository) ProcessDriverQuery(query *models.QueryRequest) {

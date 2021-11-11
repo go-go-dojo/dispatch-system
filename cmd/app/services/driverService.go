@@ -4,6 +4,7 @@ import (
 	"daitan-dispatch-system/cmd/app/models"
 	"daitan-dispatch-system/cmd/app/repositories"
 	"fmt"
+	"reflect"
 	"sync"
 
 	"github.com/google/uuid"
@@ -11,6 +12,11 @@ import (
 
 type DriverService struct {
 	driverRepo repositories.DriverRepository
+}
+
+type Message struct {
+	msgType reflect.Type
+	payload interface{}
 }
 
 var driverInstance *DriverService
@@ -59,6 +65,10 @@ func (t *DriverService) UpdateDriverStatus(uuid string, driver *models.DriverSta
 }
 
 func (t *DriverService) NewTripRequest(req *models.TripRequest) {
+	msg := Message{
+		msgType: reflect.TypeOf(models.TripRequest),
+		payload: req,
+	}
 	req.Uuid = uuid.New().String()
 	t.driverRepo.NewRequest(req)
 }
