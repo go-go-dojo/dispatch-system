@@ -14,10 +14,20 @@ type IService interface {
 	ProcessPayload(payload interface{})
 }
 
-type TripRequest struct {
+type TripRequestType struct {
 }
 
-func (t *TripRequest) ProcessPayload(payload interface{}) {
+type DriverUpdateType struct {
+}
+
+func (t *TripRequestType) ProcessPayload(payload interface{}) {
+	driver, err := s.ProcessTripRequest(payload.(*models.TripRequest))
+	//	if (driver != nil) || (err != nil) {
+	//		s.ResponseCh <- driver
+	//	}
+}
+
+func (t *DriverUpdateType) ProcessPayload(payload interface{}) {
 	// algo
 }
 
