@@ -15,8 +15,8 @@ type DriverService struct {
 }
 
 type Message struct {
-	msgType reflect.Type
-	payload interface{}
+	MsgType reflect.Type
+	Payload interface{}
 }
 
 var driverInstance *DriverService

@@ -15,7 +15,6 @@ type IService interface {
 }
 
 type TripRequest struct {
-
 }
 
 func (t *TripRequest) ProcessPayload(payload interface{}) {
@@ -25,17 +24,17 @@ func (t *TripRequest) ProcessPayload(payload interface{}) {
 type DriverRepository struct {
 	drivers map[string]*models.DriverInfo
 
-	handles map[services.Message]IService
+	handles map[reflect.Type]IService
 
-	requestCh  chan interface{}
-	ResponseCh chan interface{}
+	requestCh  chan *services.Message
+	ResponseCh chan *services.Message
 }
 
 func (s *DriverRepository) Init() {
 	if s.drivers == nil {
 		s.drivers = make(map[string]*models.DriverInfo)
-		s.requestCh = make(chan interface{})
-		s.ResponseCh = make(chan interface{})
+		s.requestCh = make(chan *services.Message)
+		s.ResponseCh = make(chan *services.Message)
 		go s.handleRequestChannel()
 	}
 }
@@ -47,38 +46,45 @@ func (s *DriverRepository) Shutdown() {
 	close(s.ResponseCh)
 }
 
-func (s *DriverRepository) NewRequest(obj interface{}) {
-	s.requestCh <- obj
+func (s *DriverRepository) RegisterService(service IService) error {
+	kind := reflect.TypeOf(service)
+	if _, exists := s.handles[kind]; exists {
+		return fmt.Errorf("service already exists %s", kind)
+	}
+	s.handles[kind] = service
+	return nil
+}
+
+func (s *DriverRepository) NewRequest(msg *services.Message) {
+	s.requestCh <- msg
 }
 
 func (s *DriverRepository) handleRequestChannel() {
-
 	for req := range s.requestCh {
-
-		switch req.(type) {
-		case *models.TripRequest:
-			// Find trip
-			driver, err := s.ProcessTripRequest(req.(*models.TripRequest))
-			if (driver != nil) || (err != nil) {
-				s.ResponseCh <- driver
-			}
-			// Take result and insert into channel
-		case *models.DriverInfo:
-			// Update or add driver
-			s.ProcessDriverInfo(req.(*models.DriverInfo))
-		case *models.DriverUpdate:
-			// Periodic driver location/status update
-			s.ProcessDriverUpdate(req.(*models.DriverUpdate))
-		case *models.QueryRequest:
-			// Request driver info
-			s.ProcessDriverQuery(req.(*models.QueryRequest))
-		default:
-			panic("[DriverRepository.handleRequestChannel] Unrecognized type")
-		}
+		svc := s.handles[req.MsgType]
+		svc.ProcessPayload(req)
+		//
+		//switch req.(type) {
+		//case *models.TripRequest:
+		//	// Find trip
+		//	driver, err := s.ProcessTripRequest(req.(*models.TripRequest))
+		//	if (driver != nil) || (err != nil) {
+		//		s.ResponseCh <- driver
+		//	}
+		//	// Take result and insert into channel
+		//case *models.DriverInfo:
+		//	// Update or add driver
+		//	s.ProcessDriverInfo(req.(*models.DriverInfo))
+		//case *models.DriverUpdate:
+		//	// Periodic driver location/status update
+		//	s.ProcessDriverUpdate(req.(*models.DriverUpdate))
+		//case *models.QueryRequest:
+		//	// Request driver info
+		//	s.ProcessDriverQuery(req.(*models.QueryRequest))
+		//default:
+		//	panic("[DriverRepository.handleRequestChannel] Unrecognized type")
+		//}
 	}
-
-	map[reflect.TypeOf(req.service)].func(req.payload)
-	s.
 }
 
 func (s *DriverRepository) ProcessDriverQuery(query *models.QueryRequest) {
