@@ -2,7 +2,6 @@ package repositories
 
 import (
 	"daitan-dispatch-system/cmd/app/models"
-	"daitan-dispatch-system/cmd/app/services"
 	"daitan-dispatch-system/cmd/app/utils"
 	"errors"
 	"fmt"
@@ -10,8 +9,13 @@ import (
 	"reflect"
 )
 
+type Message struct {
+	MsgType reflect.Type
+	Payload interface{}
+}
+
 type IService interface {
-	ProcessPayload(payload interface{})
+	ProcessPayload(payload interface{}, s *DriverRepository)
 }
 
 type TripRequestType struct {
@@ -20,14 +24,14 @@ type TripRequestType struct {
 type DriverUpdateType struct {
 }
 
-func (t *TripRequestType) ProcessPayload(payload interface{}) {
+func (t *TripRequestType) ProcessPayload(payload interface{}, s *DriverRepository) {
 	driver, err := s.ProcessTripRequest(payload.(*models.TripRequest))
-	//	if (driver != nil) || (err != nil) {
-	//		s.ResponseCh <- driver
-	//	}
+	if (driver != nil) || (err != nil) {
+		s.ResponseCh <- driver
+	}
 }
 
-func (t *DriverUpdateType) ProcessPayload(payload interface{}) {
+func (t *DriverUpdateType) ProcessPayload(payload interface{}, s *DriverRepository) {
 	// algo
 }
 
@@ -36,15 +40,15 @@ type DriverRepository struct {
 
 	handles map[reflect.Type]IService
 
-	requestCh  chan *services.Message
-	ResponseCh chan *services.Message
+	requestCh  chan *Message
+	ResponseCh chan *Message
 }
 
 func (s *DriverRepository) Init() {
 	if s.drivers == nil {
 		s.drivers = make(map[string]*models.DriverInfo)
-		s.requestCh = make(chan *services.Message)
-		s.ResponseCh = make(chan *services.Message)
+		s.requestCh = make(chan *Message)
+		s.ResponseCh = make(chan *Message)
 		go s.handleRequestChannel()
 	}
 }
@@ -65,14 +69,14 @@ func (s *DriverRepository) RegisterService(service IService) error {
 	return nil
 }
 
-func (s *DriverRepository) NewRequest(msg *services.Message) {
+func (s *DriverRepository) NewRequest(msg *Message) {
 	s.requestCh <- msg
 }
 
 func (s *DriverRepository) handleRequestChannel() {
 	for req := range s.requestCh {
 		svc := s.handles[req.MsgType]
-		svc.ProcessPayload(req)
+		svc.ProcessPayload(req, s)
 		//
 		//switch req.(type) {
 		//case *models.TripRequest:

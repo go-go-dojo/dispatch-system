@@ -14,11 +14,6 @@ type DriverService struct {
 	driverRepo repositories.DriverRepository
 }
 
-type Message struct {
-	MsgType reflect.Type
-	Payload interface{}
-}
-
 var driverInstance *DriverService
 var driverOnce sync.Once
 
@@ -65,9 +60,9 @@ func (t *DriverService) UpdateDriverStatus(uuid string, driver *models.DriverSta
 }
 
 func (t *DriverService) NewTripRequest(req *models.TripRequest) {
-	msg := Message{
-		msgType: reflect.TypeOf(models.TripRequest),
-		payload: req,
+	msg := repositories.Message{
+		MsgType: reflect.TypeOf(models.TripRequest),
+		Payload: req,
 	}
 	req.Uuid = uuid.New().String()
 	t.driverRepo.NewRequest(req)

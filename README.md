@@ -13,3 +13,7 @@ Uber-like service which dispatches drivers according to client trip requests.
 
 - Replace the switch case in driverRepository.handleRequestChannel with a Registry
 - Implement periodic updates to the client upon a successful trip request
+
+### 11/11/2021
+
+- Implemented registry pattern in driverRepository.handleRequestChannel
