@@ -11,5 +11,5 @@ Uber-like service which dispatches drivers according to client trip requests.
 
 ### Next steps (in no particular order)
 
-- Implement periodic updates to the client upon a successful trip request
 - Replace the switch case in driverRepository.handleRequestChannel with a Registry
+- Implement periodic updates to the client upon a successful trip request

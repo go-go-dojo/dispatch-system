@@ -6,10 +6,13 @@ import (
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
+	"reflect"
 )
 
 type DriverRepository struct {
 	drivers map[string]*models.DriverInfo
+
+	handles map[reflect.Type]*models.DriverInfo
 
 	requestCh  chan interface{}
 	ResponseCh chan interface{}
@@ -36,7 +39,9 @@ func (s *DriverRepository) NewRequest(obj interface{}) {
 }
 
 func (s *DriverRepository) handleRequestChannel() {
+
 	for req := range s.requestCh {
+
 		switch req.(type) {
 		case *models.TripRequest:
 			// Find trip
