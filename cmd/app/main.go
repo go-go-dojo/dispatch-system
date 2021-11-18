@@ -1,7 +1,7 @@
 package main
 
 import (
-	"daitan-dispatch-system/cmd/app/services"
+	"dispatch-system/services"
 	"flag"
 	"fmt"
 	"log"

@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"daitan-dispatch-system/cmd/app/models"
-	"daitan-dispatch-system/cmd/app/services"
+	"dispatch-system/models"
+	"dispatch-system/services"
 
 	"github.com/gorilla/mux"
 )

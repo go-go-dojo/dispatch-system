@@ -1,8 +1,8 @@
 package services
 
 import (
-	"daitan-dispatch-system/cmd/app/models"
-	"daitan-dispatch-system/cmd/app/repositories"
+	"dispatch-system/models"
+	"dispatch-system/repositories"
 	"fmt"
 	"reflect"
 	"sync"
@@ -69,15 +69,27 @@ func (t *DriverService) NewTripRequest(req *models.TripRequest) {
 }
 
 func (t *DriverService) NewDriverInfo(info *models.DriverInfo) {
-	t.driverRepo.NewRequest(info)
+	msg := repositories.Message{
+		MsgType: reflect.TypeOf(repositories.DriverInfoType{}),
+		Payload: info,
+	}
+	t.driverRepo.NewRequest(&msg)
 }
 
 func (t *DriverService) NewDriverUpdate(update *models.DriverUpdate) {
-	t.driverRepo.NewRequest(update)
+	msg := repositories.Message{
+		MsgType: reflect.TypeOf(repositories.DriverUpdateType{}),
+		Payload: update,
+	}
+	t.driverRepo.NewRequest(&msg)
 }
 
 func (t *DriverService) NewDriverQuery(query *models.QueryRequest) {
-	t.driverRepo.NewRequest(query)
+	msg := repositories.Message{
+		MsgType: reflect.TypeOf(repositories.DriverQueryType{}),
+		Payload: query,
+	}
+	t.driverRepo.NewRequest(&msg)
 }
 
 func (t *DriverService) handleDriverRepositoryResponse() {
