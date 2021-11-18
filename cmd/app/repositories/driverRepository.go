@@ -38,15 +38,37 @@ func (t *TripRequestType) ProcessPayload(payload interface{}, s *DriverRepositor
 }
 
 func (t *DriverUpdateType) ProcessPayload(payload interface{}, s *DriverRepository) {
-	// algo
+	update := payload.(*models.DriverUpdate)
+	if driver, ok := s.drivers[update.Uuid]; ok {
+		driver.Update(*update)
+	} else {
+		fmt.Printf("[DriverRepository.ProcessDriverUpdate] Unknwon driver id=%s\n", update.Uuid)
+	}
 }
 
 func (t *DriverInfoType) ProcessPayload(payload interface{}, s *DriverRepository) {
-	// algo
+	newDriver := payload.(*models.DriverInfo)
+	if driver, ok := s.drivers[newDriver.Uuid]; ok && (newDriver.Uuid != "") {
+		// Due to this simplification, new drivers are able to override other driver's information
+		fmt.Printf("[DriverRepository.ProcessDriverInfo] DriverInfo updated, %s\n", *driver)
+		s.drivers[newDriver.Uuid] = newDriver
+	} else {
+		// New driver, generate unique id
+		if newDriver.Uuid == "" {
+			newDriver.Uuid = uuid.New().String()
+		}
+		s.drivers[newDriver.Uuid] = newDriver
+		fmt.Printf("[DriverRepository.ProcessDriverInfo] New driver registered, %s\n", *s.drivers[newDriver.Uuid])
+	}
 }
 
 func (t *DriverQueryType) ProcessPayload(payload interface{}, s *DriverRepository) {
-	// algo
+	query := payload.(models.QueryRequest)
+	if driver, ok := s.drivers[query.Uuid]; ok {
+		fmt.Printf("[DriverRepository.ProcessDriverQuery] Driver info=%s\n", driver)
+	} else {
+		fmt.Printf("[DriverRepository.ProcessDriverQuery] Could not find driver info for id=%s\n", query.Uuid)
+	}
 }
 
 type DriverRepository struct {
@@ -63,6 +85,7 @@ func (s *DriverRepository) Init() {
 		s.drivers = make(map[string]*models.DriverInfo)
 		s.requestCh = make(chan *Message)
 		s.ResponseCh = make(chan interface{})
+		s.handles = make(map[reflect.Type]IService)
 		go s.handleRequestChannel()
 	}
 }
@@ -115,40 +138,40 @@ func (s *DriverRepository) handleRequestChannel() {
 	}
 }
 
-func (s *DriverRepository) ProcessDriverQuery(query *models.QueryRequest) {
-
-	if driver, ok := s.drivers[query.Uuid]; ok {
-		fmt.Printf("[DriverRepository.ProcessDriverQuery] Driver info=%s\n", driver)
-	} else {
-		fmt.Printf("[DriverRepository.ProcessDriverQuery] Could not find driver info for id=%s\n", query.Uuid)
-	}
-}
-
-func (s *DriverRepository) ProcessDriverUpdate(update *models.DriverUpdate) {
-
-	if driver, ok := s.drivers[update.Uuid]; ok {
-		driver.Update(*update)
-	} else {
-		fmt.Printf("[DriverRepository.ProcessDriverUpdate] Unknwon driver id=%s\n", update.Uuid)
-	}
-}
-
-func (s *DriverRepository) ProcessDriverInfo(newDriver *models.DriverInfo) {
-
-	if driver, ok := s.drivers[newDriver.Uuid]; ok && (newDriver.Uuid != "") {
-		// Due to this simplification, new drivers are able to override other driver's information
-		fmt.Printf("[DriverRepository.ProcessDriverInfo] DriverInfo updated, %s\n", *driver)
-		s.drivers[newDriver.Uuid] = newDriver
-	} else {
-		// New driver, generate unique id
-		if newDriver.Uuid == "" {
-			newDriver.Uuid = uuid.New().String()
-		}
-		s.drivers[newDriver.Uuid] = newDriver
-		fmt.Printf("[DriverRepository.ProcessDriverInfo] New driver registered, %s\n", *s.drivers[newDriver.Uuid])
-	}
-}
-
+//func (s *DriverRepository) ProcessDriverQuery(query *models.QueryRequest) {
+//
+//	if driver, ok := s.drivers[query.Uuid]; ok {
+//		fmt.Printf("[DriverRepository.ProcessDriverQuery] Driver info=%s\n", driver)
+//	} else {
+//		fmt.Printf("[DriverRepository.ProcessDriverQuery] Could not find driver info for id=%s\n", query.Uuid)
+//	}
+//}
+//
+//func (s *DriverRepository) ProcessDriverUpdate(update *models.DriverUpdate) {
+//
+//	if driver, ok := s.drivers[update.Uuid]; ok {
+//		driver.Update(*update)
+//	} else {
+//		fmt.Printf("[DriverRepository.ProcessDriverUpdate] Unknwon driver id=%s\n", update.Uuid)
+//	}
+//}
+//
+//func (s *DriverRepository) ProcessDriverInfo(newDriver *models.DriverInfo) {
+//
+//	if driver, ok := s.drivers[newDriver.Uuid]; ok && (newDriver.Uuid != "") {
+//		// Due to this simplification, new drivers are able to override other driver's information
+//		fmt.Printf("[DriverRepository.ProcessDriverInfo] DriverInfo updated, %s\n", *driver)
+//		s.drivers[newDriver.Uuid] = newDriver
+//	} else {
+//		// New driver, generate unique id
+//		if newDriver.Uuid == "" {
+//			newDriver.Uuid = uuid.New().String()
+//		}
+//		s.drivers[newDriver.Uuid] = newDriver
+//		fmt.Printf("[DriverRepository.ProcessDriverInfo] New driver registered, %s\n", *s.drivers[newDriver.Uuid])
+//	}
+//}
+//
 func (s *DriverRepository) ProcessTripRequest(req *models.TripRequest) (*models.DriverInfo, error) {
 	var dist, lowestDist float64
 	var closestDriver *models.DriverInfo
