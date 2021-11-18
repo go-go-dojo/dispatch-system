@@ -1,4 +1,4 @@
-module daitan-dispatch-system
+module dispatch-system
 
 go 1.16
 

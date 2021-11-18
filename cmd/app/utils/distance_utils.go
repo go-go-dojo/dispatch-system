@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"daitan-dispatch-system/cmd/app/models"
+	"dispatch-system/models"
 	"math"
 )
 

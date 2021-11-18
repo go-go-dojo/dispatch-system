@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"daitan-dispatch-system/cmd/app/models"
-	"daitan-dispatch-system/cmd/app/utils"
+	"dispatch-system/models"
+	"dispatch-system/utils"
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
@@ -24,6 +24,12 @@ type TripRequestType struct {
 type DriverUpdateType struct {
 }
 
+type DriverInfoType struct {
+}
+
+type DriverQueryType struct {
+}
+
 func (t *TripRequestType) ProcessPayload(payload interface{}, s *DriverRepository) {
 	driver, err := s.ProcessTripRequest(payload.(*models.TripRequest))
 	if (driver != nil) || (err != nil) {
@@ -32,6 +38,14 @@ func (t *TripRequestType) ProcessPayload(payload interface{}, s *DriverRepositor
 }
 
 func (t *DriverUpdateType) ProcessPayload(payload interface{}, s *DriverRepository) {
+	// algo
+}
+
+func (t *DriverInfoType) ProcessPayload(payload interface{}, s *DriverRepository) {
+	// algo
+}
+
+func (t *DriverQueryType) ProcessPayload(payload interface{}, s *DriverRepository) {
 	// algo
 }
 

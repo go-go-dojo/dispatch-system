@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"daitan-dispatch-system/cmd/app/models"
+	"dispatch-system/models"
 )
 
 func TestDriverRepository_ProcessDriverInfo(t *testing.T) {
