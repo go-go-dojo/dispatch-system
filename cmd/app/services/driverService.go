@@ -61,11 +61,11 @@ func (t *DriverService) UpdateDriverStatus(uuid string, driver *models.DriverSta
 
 func (t *DriverService) NewTripRequest(req *models.TripRequest) {
 	msg := repositories.Message{
-		MsgType: reflect.TypeOf(models.TripRequest),
+		MsgType: reflect.TypeOf(repositories.TripRequestType{}),
 		Payload: req,
 	}
 	req.Uuid = uuid.New().String()
-	t.driverRepo.NewRequest(req)
+	t.driverRepo.NewRequest(&msg)
 }
 
 func (t *DriverService) NewDriverInfo(info *models.DriverInfo) {

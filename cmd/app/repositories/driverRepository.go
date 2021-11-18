@@ -41,14 +41,14 @@ type DriverRepository struct {
 	handles map[reflect.Type]IService
 
 	requestCh  chan *Message
-	ResponseCh chan *Message
+	ResponseCh chan interface{}
 }
 
 func (s *DriverRepository) Init() {
 	if s.drivers == nil {
 		s.drivers = make(map[string]*models.DriverInfo)
 		s.requestCh = make(chan *Message)
-		s.ResponseCh = make(chan *Message)
+		s.ResponseCh = make(chan interface{})
 		go s.handleRequestChannel()
 	}
 }
@@ -77,7 +77,7 @@ func (s *DriverRepository) handleRequestChannel() {
 	for req := range s.requestCh {
 		svc := s.handles[req.MsgType]
 		svc.ProcessPayload(req, s)
-		//
+
 		//switch req.(type) {
 		//case *models.TripRequest:
 		//	// Find trip
