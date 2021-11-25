@@ -57,6 +57,8 @@ func TestDriverRepository_ProcessDriverInfo(t *testing.T) {
 	driverInfoType := &DriverInfoType{}
 	s.RegisterService(driverInfoType)
 
+	go s.HandleRequestChannel()
+
 	for _, driver := range drivers {
 		s.NewRequest(&Message{Payload: driver, MsgType: reflect.TypeOf(DriverInfoType{})})
 	}

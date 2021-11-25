@@ -86,8 +86,11 @@ func (s *DriverRepository) Init() {
 		s.requestCh = make(chan *Message)
 		s.ResponseCh = make(chan interface{})
 		s.handles = make(map[reflect.Type]IService)
-		go s.handleRequestChannel()
 	}
+}
+
+func (s *DriverRepository) HandleRequestChannel() {
+	s.handleRequestChannel()
 }
 
 func (s *DriverRepository) Shutdown() {
@@ -112,12 +115,15 @@ func (s *DriverRepository) NewRequest(msg *Message) {
 
 func (s *DriverRepository) handleRequestChannel() {
 	for req := range s.requestCh {
-		svc := s.handles[req.MsgType]
-		svc.ProcessPayload(req, s)
+		if svc, ok := s.handles[req.MsgType]; ok {
+			svc.ProcessPayload(req, s)
+		} else {
+			fmt.Printf("MsgType=%s NotFound\n", req.MsgType)
+		}
 
 		//switch req.(type) {
 		//case *models.TripRequest:
-		//	// Find trip
+		//	// Find tr ip
 		//	driver, err := s.ProcessTripRequest(req.(*models.TripRequest))
 		//	if (driver != nil) || (err != nil) {
 		//		s.ResponseCh <- driver
