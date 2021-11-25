@@ -55,12 +55,12 @@ func TestDriverRepository_ProcessDriverInfo(t *testing.T) {
 	s.drivers = driverMap
 
 	driverInfoType := &DriverInfoType{}
-	s.RegisterService(driverInfoType)
-
-	go s.HandleRequestChannel()
+	if err := s.RegisterService(driverInfoType); err != nil {
+		t.Error(err)
+	}
 
 	for _, driver := range drivers {
-		s.NewRequest(&Message{Payload: driver, MsgType: reflect.TypeOf(&DriverInfoType{})})
+		s.handleRequest(&Message{Payload: driver, MsgType: reflect.TypeOf(&DriverInfoType{})})
 	}
 
 	if d, ok := s.drivers["717995b2-978b"]; ok {

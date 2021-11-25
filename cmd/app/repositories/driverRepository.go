@@ -90,7 +90,9 @@ func (s *DriverRepository) Init() {
 }
 
 func (s *DriverRepository) HandleRequestChannel() {
-	s.handleRequestChannel()
+	for req := range s.requestCh {
+		s.handleRequest(req)
+	}
 }
 
 func (s *DriverRepository) Shutdown() {
@@ -114,34 +116,11 @@ func (s *DriverRepository) NewRequest(msg *Message) {
 	s.requestCh <- msg
 }
 
-func (s *DriverRepository) handleRequestChannel() {
-	for req := range s.requestCh {
-		if svc, ok := s.handles[req.MsgType.String()]; ok {
-			svc.ProcessPayload(req, s)
-		} else {
-			fmt.Printf("MsgType=%s NotFound\n", req.MsgType)
-		}
-
-		//switch req.(type) {
-		//case *models.TripRequest:
-		//	// Find tr ip
-		//	driver, err := s.ProcessTripRequest(req.(*models.TripRequest))
-		//	if (driver != nil) || (err != nil) {
-		//		s.ResponseCh <- driver
-		//	}
-		//	// Take result and insert into channel
-		//case *models.DriverInfo:
-		//	// Update or add driver
-		//	s.ProcessDriverInfo(req.(*models.DriverInfo))
-		//case *models.DriverUpdate:
-		//	// Periodic driver location/status update
-		//	s.ProcessDriverUpdate(req.(*models.DriverUpdate))
-		//case *models.QueryRequest:
-		//	// Request driver info
-		//	s.ProcessDriverQuery(req.(*models.QueryRequest))
-		//default:
-		//	panic("[DriverRepository.handleRequestChannel] Unrecognized type")
-		//}
+func (s *DriverRepository) handleRequest(req *Message) {
+	if svc, ok := s.handles[req.MsgType.String()]; ok {
+		svc.ProcessPayload(req.Payload, s)
+	} else {
+		fmt.Printf("MsgType=%s NotFound\n", req.MsgType)
 	}
 }
 
