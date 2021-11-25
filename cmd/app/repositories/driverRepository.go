@@ -74,7 +74,7 @@ func (t *DriverQueryType) ProcessPayload(payload interface{}, s *DriverRepositor
 type DriverRepository struct {
 	drivers map[string]*models.DriverInfo
 
-	handles map[reflect.Type]IService
+	handles map[string]IService
 
 	requestCh  chan *Message
 	ResponseCh chan interface{}
@@ -85,7 +85,7 @@ func (s *DriverRepository) Init() {
 		s.drivers = make(map[string]*models.DriverInfo)
 		s.requestCh = make(chan *Message)
 		s.ResponseCh = make(chan interface{})
-		s.handles = make(map[reflect.Type]IService)
+		s.handles = make(map[string]IService)
 	}
 }
 
@@ -101,11 +101,12 @@ func (s *DriverRepository) Shutdown() {
 }
 
 func (s *DriverRepository) RegisterService(service IService) error {
-	kind := reflect.TypeOf(service)
-	if _, exists := s.handles[kind]; exists {
-		return fmt.Errorf("service already exists %s", kind)
+
+	name := reflect.TypeOf(service).String()
+	if _, exists := s.handles[name]; exists {
+		return fmt.Errorf("service already exists %s", name)
 	}
-	s.handles[kind] = service
+	s.handles[name] = service
 	return nil
 }
 
@@ -115,7 +116,7 @@ func (s *DriverRepository) NewRequest(msg *Message) {
 
 func (s *DriverRepository) handleRequestChannel() {
 	for req := range s.requestCh {
-		if svc, ok := s.handles[req.MsgType]; ok {
+		if svc, ok := s.handles[req.MsgType.String()]; ok {
 			svc.ProcessPayload(req, s)
 		} else {
 			fmt.Printf("MsgType=%s NotFound\n", req.MsgType)
