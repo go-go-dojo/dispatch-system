@@ -87,10 +87,32 @@ func (s *DriverRepository) Init() {
 		s.ResponseCh = make(chan interface{})
 		s.handles = make(map[string]IService)
 	}
+
+	tripRequestType := &TripRequestType{}
+	if err := s.RegisterService(tripRequestType); err != nil {
+		fmt.Printf("Error at TripRequestType: %s", err.Error())
+	}
+
+	driverUpdateType := &DriverUpdateType{}
+	if err := s.RegisterService(driverUpdateType); err != nil {
+		fmt.Printf("Error at DriverUpdateType: %s", err.Error())
+	}
+
+	driverInfoType := &DriverInfoType{}
+	if err := s.RegisterService(driverInfoType); err != nil {
+		fmt.Printf("Error at DriverInfoType: %s", err.Error())
+	}
+
+	driverQueryType := &DriverQueryType{}
+	if err := s.RegisterService(driverQueryType); err != nil {
+		fmt.Printf("Error at DriverQueryType: %s", err.Error())
+	}
+
 }
 
 func (s *DriverRepository) HandleRequestChannel() {
 	for req := range s.requestCh {
+		fmt.Printf("MsgType Name %s\n", req.MsgType.String())
 		s.handleRequest(req)
 	}
 }
@@ -113,11 +135,18 @@ func (s *DriverRepository) RegisterService(service IService) error {
 }
 
 func (s *DriverRepository) NewRequest(msg *Message) {
+
 	s.requestCh <- msg
 }
 
 func (s *DriverRepository) handleRequest(req *Message) {
+
+	for k, _ := range s.handles {
+		fmt.Printf("Key %s\n", k)
+	}
+
 	if svc, ok := s.handles[req.MsgType.String()]; ok {
+		fmt.Printf("MsgType %s\n", req.MsgType.String())
 		svc.ProcessPayload(req.Payload, s)
 	} else {
 		fmt.Printf("MsgType=%s NotFound\n", req.MsgType)

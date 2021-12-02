@@ -18,7 +18,7 @@ type application struct {
 func main() {
 
 	host := flag.String("host", "localhost", "HTTP server network address")
-	port := flag.Int("port", 8080, "HTTP server network port")
+	port := flag.Int("port", 8089, "HTTP server network port")
 
 	flag.Parse()
 
