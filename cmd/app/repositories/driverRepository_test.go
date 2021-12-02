@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"fmt"
+	"github.com/stretchr/testify/require"
 	"reflect"
 	"testing"
 
@@ -89,109 +90,114 @@ func TestDriverRepository_ProcessDriverInfo(t *testing.T) {
 	}
 }
 
-//
-//func TestDriverRepository_ProcessTripRequestEmptyDriver(t *testing.T) {
-//
-//	requests := []*models.TripRequest{{
-//		Datetime: "",
-//		Location: models.Location{
-//			Latitude:  0,
-//			Longitude: 0,
-//		},
-//		Uuid:   "",
-//		Status: 0,
-//	}}
-//
-//	s := new(DriverRepository)
-//	s.Init()
-//
-//	for _, req := range requests {
-//		_, err := s.ProcessTripRequest(req)
-//
-//		if err == nil {
-//			t.Fatalf("Error expected because there are not drivers")
-//		}
-//	}
-//	s.Shutdown()
-//}
-//
-//func TestDriverRepository_ProcessTripRequest(t *testing.T) {
-//
-//	r := require.New(t)
-//
-//	requests := []*models.TripRequest{{
-//		Datetime: "",
-//		Location: models.Location{
-//			Latitude:  0.1,
-//			Longitude: 0.1,
-//		},
-//		Uuid:   "",
-//		Status: 0,
-//	}, {
-//		Datetime: "",
-//		Location: models.Location{
-//			Latitude:  0.5,
-//			Longitude: 0.5,
-//		},
-//		Uuid:   "",
-//		Status: 0,
-//	}}
-//
-//	drivers := []*models.DriverInfo{{
-//		Uuid:    "f025aff2-0a8e-496c-9722-0612fb35987b",
-//		Name:    "Eder Souza",
-//		Ranking: 0,
-//		Trips:   0,
-//		Car:     models.Car{},
-//		Status:  models.AVAILABLE,
-//		Location: models.Location{
-//			Latitude:  0,
-//			Longitude: 0,
-//		},
-//	}, {
-//		Uuid:    "ec558937-9aba-4463-b371-778e8f4bde7d",
-//		Name:    "Alioth Latour",
-//		Ranking: 0,
-//		Trips:   0,
-//		Car:     models.Car{},
-//		Status:  models.AVAILABLE,
-//		Location: models.Location{
-//			Latitude:  0.6,
-//			Longitude: 0.6,
-//		},
-//	}, {
-//		Uuid:    "4a0bf4f1-65d2-40e6-83a2-fbdeef992216",
-//		Name:    "Alexandre",
-//		Ranking: 0,
-//		Trips:   0,
-//		Car:     models.Car{},
-//		Status:  models.ON_TRIP,
-//		Location: models.Location{
-//			Latitude:  0.1,
-//			Longitude: 0.1,
-//		},
-//	}}
-//
-//	var closestDrivers []*models.DriverInfo
-//
-//	s := new(DriverRepository)
-//	s.Init()
-//
-//	for _, info := range drivers {
-//		s.ProcessDriverInfo(info)
-//	}
-//
-//	for _, req := range requests {
-//		if d, err := s.ProcessTripRequest(req); err == nil {
-//			closestDrivers = append(closestDrivers, d)
-//		}
-//	}
-//
-//	r.Len(closestDrivers, 2)
-//	r.Equal("f025aff2-0a8e-496c-9722-0612fb35987b", closestDrivers[0].Uuid)
-//	r.Equal("ec558937-9aba-4463-b371-778e8f4bde7d", closestDrivers[1].Uuid)
-//	s.Shutdown()
-//}
+func TestDriverRepository_ProcessTripRequestEmptyDriver(t *testing.T) {
+
+	requests := []*models.TripRequest{{
+		Datetime: "",
+		Location: models.Location{
+			Latitude:  0,
+			Longitude: 0,
+		},
+		Uuid:   "",
+		Status: 0,
+	}}
+
+	s := new(DriverRepository)
+	s.Init()
+
+	for _, req := range requests {
+		_, err := s.ProcessTripRequest(req)
+
+		if err == nil {
+			t.Fatalf("Error expected because there are not drivers")
+		}
+	}
+	s.Shutdown()
+}
+
+func TestDriverRepository_ProcessTripRequest(t *testing.T) {
+
+	r := require.New(t)
+
+	requests := []*models.TripRequest{{
+		Datetime: "",
+		Location: models.Location{
+			Latitude:  0.1,
+			Longitude: 0.1,
+		},
+		Uuid:   "",
+		Status: 0,
+	}, {
+		Datetime: "",
+		Location: models.Location{
+			Latitude:  0.5,
+			Longitude: 0.5,
+		},
+		Uuid:   "",
+		Status: 0,
+	}}
+
+	drivers := []*models.DriverInfo{{
+		Uuid:    "f025aff2-0a8e-496c-9722-0612fb35987b",
+		Name:    "Eder Souza",
+		Ranking: 0,
+		Trips:   0,
+		Car:     models.Car{},
+		Status:  models.AVAILABLE,
+		Location: models.Location{
+			Latitude:  0,
+			Longitude: 0,
+		},
+	}, {
+		Uuid:    "ec558937-9aba-4463-b371-778e8f4bde7d",
+		Name:    "Alioth Latour",
+		Ranking: 0,
+		Trips:   0,
+		Car:     models.Car{},
+		Status:  models.AVAILABLE,
+		Location: models.Location{
+			Latitude:  0.6,
+			Longitude: 0.6,
+		},
+	}, {
+		Uuid:    "4a0bf4f1-65d2-40e6-83a2-fbdeef992216",
+		Name:    "Alexandre",
+		Ranking: 0,
+		Trips:   0,
+		Car:     models.Car{},
+		Status:  models.ON_TRIP,
+		Location: models.Location{
+			Latitude:  0.1,
+			Longitude: 0.1,
+		},
+	}}
+
+	var closestDrivers []*models.DriverInfo
+
+	s := new(DriverRepository)
+	s.Init()
+
+	driverInfoType := &DriverInfoType{}
+	if err := s.RegisterService(driverInfoType); err != nil {
+		t.Error(err)
+	}
+
+	for _, driver := range drivers {
+		s.handleRequest(&Message{Payload: driver, MsgType: reflect.TypeOf(&DriverInfoType{})})
+	}
+
+	for _, req := range requests {
+		if d, err := s.ProcessTripRequest(req); err == nil {
+			closestDrivers = append(closestDrivers, d)
+		}
+	}
+
+	r.Len(closestDrivers, 2)
+	r.Equal("f025aff2-0a8e-496c-9722-0612fb35987b", closestDrivers[0].Uuid)
+	r.Equal("ec558937-9aba-4463-b371-778e8f4bde7d", closestDrivers[1].Uuid)
+	s.Shutdown()
+}
+
 //
 //func setup() *DriverRepository {
 //
