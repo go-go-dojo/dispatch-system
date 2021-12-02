@@ -34,6 +34,10 @@ func (app *application) updateDriver(w http.ResponseWriter, r *http.Request) {
 	}
 
 	services.GetDriverService().NewDriverUpdate(&update)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	//w.Write()
 }
 
 func (app *application) AddNewDriver(w http.ResponseWriter, r *http.Request) {
