@@ -17,3 +17,7 @@ Uber-like service which dispatches drivers according to client trip requests.
 ### 11/11/2021
 
 - Implemented registry pattern in driverRepository.handleRequestChannel
+
+### 25/11/2021
+
+- Fixed `TestDriverRepository_ProcessDriverInfo`, other tests are still not working.
