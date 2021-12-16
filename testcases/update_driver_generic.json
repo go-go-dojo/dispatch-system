@@ -1,9 +1,9 @@
 {
-	"Uuid": "",
-	"Status": 1,
-	"Location":
+	"uuid": "",
+	"status": 1,
+	"location":
 	{
-		"Latitude": -51.289573,
-		"Longitude": -30.045988
+		"latitude": -51.289573,
+		"longitude": -30.045988
 	}
 }
