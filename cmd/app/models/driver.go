@@ -1,6 +1,9 @@
 package models
 
-import "fmt"
+import (
+	"fmt"
+	"log"
+)
 
 type Driver interface {
 	Update(update DriverUpdate)
@@ -32,6 +35,7 @@ func (d *DriverInfo) IsAvailable() bool {
 func (d *DriverInfo) Update(update DriverUpdate) {
 	d.Status = update.Status
 	d.Location = update.Location
+	log.Printf("[DriverInfo.Update] Updated driver %s, status=%d, location=%v\n", d.Uuid, d.Status, d.Location)
 }
 
 func (d DriverInfo) String() string {

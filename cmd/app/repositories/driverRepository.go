@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
+	"log"
 	"reflect"
 )
 
@@ -32,7 +33,10 @@ type DriverQueryType struct {
 
 func (t *TripRequestType) ProcessPayload(payload interface{}, s *DriverRepository) {
 	driver, err := s.ProcessTripRequest(payload.(*models.TripRequest))
-	if (driver != nil) || (err != nil) {
+	if err != nil {
+		log.Printf("[TripRequest.ProcessPayload] Error=%s\n", err.Error())
+	}
+	if driver != nil {
 		s.ResponseCh <- driver
 	}
 }
@@ -112,7 +116,6 @@ func (s *DriverRepository) Init() {
 
 func (s *DriverRepository) HandleRequestChannel() {
 	for req := range s.requestCh {
-		fmt.Printf("MsgType Name %s\n", req.MsgType.String())
 		s.handleRequest(req)
 	}
 }
@@ -141,52 +144,13 @@ func (s *DriverRepository) NewRequest(msg *Message) {
 
 func (s *DriverRepository) handleRequest(req *Message) {
 
-	for k, _ := range s.handles {
-		fmt.Printf("Key %s\n", k)
-	}
-
 	if svc, ok := s.handles[req.MsgType.String()]; ok {
-		fmt.Printf("MsgType %s\n", req.MsgType.String())
 		svc.ProcessPayload(req.Payload, s)
 	} else {
-		fmt.Printf("MsgType=%s NotFound\n", req.MsgType)
+		fmt.Printf("Error, MsgType=%s not found\n", req.MsgType)
 	}
 }
 
-//func (s *DriverRepository) ProcessDriverQuery(query *models.QueryRequest) {
-//
-//	if driver, ok := s.drivers[query.Uuid]; ok {
-//		fmt.Printf("[DriverRepository.ProcessDriverQuery] Driver info=%s\n", driver)
-//	} else {
-//		fmt.Printf("[DriverRepository.ProcessDriverQuery] Could not find driver info for id=%s\n", query.Uuid)
-//	}
-//}
-//
-//func (s *DriverRepository) ProcessDriverUpdate(update *models.DriverUpdate) {
-//
-//	if driver, ok := s.drivers[update.Uuid]; ok {
-//		driver.Update(*update)
-//	} else {
-//		fmt.Printf("[DriverRepository.ProcessDriverUpdate] Unknwon driver id=%s\n", update.Uuid)
-//	}
-//}
-//
-//func (s *DriverRepository) ProcessDriverInfo(newDriver *models.DriverInfo) {
-//
-//	if driver, ok := s.drivers[newDriver.Uuid]; ok && (newDriver.Uuid != "") {
-//		// Due to this simplification, new drivers are able to override other driver's information
-//		fmt.Printf("[DriverRepository.ProcessDriverInfo] DriverInfo updated, %s\n", *driver)
-//		s.drivers[newDriver.Uuid] = newDriver
-//	} else {
-//		// New driver, generate unique id
-//		if newDriver.Uuid == "" {
-//			newDriver.Uuid = uuid.New().String()
-//		}
-//		s.drivers[newDriver.Uuid] = newDriver
-//		fmt.Printf("[DriverRepository.ProcessDriverInfo] New driver registered, %s\n", *s.drivers[newDriver.Uuid])
-//	}
-//}
-//
 func (s *DriverRepository) ProcessTripRequest(req *models.TripRequest) (*models.DriverInfo, error) {
 	var dist, lowestDist float64
 	var closestDriver *models.DriverInfo
