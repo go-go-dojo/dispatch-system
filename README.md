@@ -11,8 +11,11 @@ Uber-like service which dispatches drivers according to client trip requests.
 
 ### Next steps (in no particular order)
 
-- Replace the switch case in driverRepository.handleRequestChannel with a Registry
-- Implement periodic updates to the client upon a successful trip request
+- ~~Unit tests~~
+- ~~Replace the switch case in driverRepository.handleRequestChannel with a Registry~~
+- Periodic updates to the passenger upon a successful trip request
+- Assign a driver to a passenger only upon driver acceptance
+- Mock driver/passenger applications to visualize working application
 
 ### Testing
 
