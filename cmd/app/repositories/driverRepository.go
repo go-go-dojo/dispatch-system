@@ -62,6 +62,10 @@ func (s *DriverRepository) add(trip *models.Trip) {
 	s.trips[trip.Uuid] = trip
 }
 
+func (s *DriverRepository) findBy(uuid string) (*models.Trip, error) {
+	return nil, nil
+}
+
 func (t *DriverUpdateType) ProcessPayload(payload interface{}, s *DriverRepository) {
 	update := payload.(*models.DriverUpdate)
 	if driver, ok := s.drivers[update.Uuid]; ok {
