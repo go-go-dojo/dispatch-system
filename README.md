@@ -21,7 +21,17 @@ Uber-like service which dispatches drivers according to client trip requests.
 
 The content of JSON files can be sent via Curl using the following command:
 
+**Register a new driver:**
+
 `curl -X POST -H 'Content-Type: application/json' -d "@./driver_info_generic.json" "localhost:8089/api/driver/updateInfo"`
+
+**Update driver status and location**
+
+`curl -X POST -H 'Content-Type: application/json' -d "@./update_driver_generic.json" "localhost:8089/api/driver/update"`
+
+**Request trip**
+
+`curl -X POST -H 'Content-Type: application/json' -d "@./trip_request_generic.json" "localhost:8089/api/trips"`
 
 ### 11/11/2021
 
