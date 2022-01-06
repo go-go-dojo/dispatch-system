@@ -18,6 +18,7 @@ var driverInstance *DriverService
 var driverOnce sync.Once
 
 func GetDriverService() *DriverService {
+
 	driverOnce.Do(func() {
 		driverInstance = &DriverService{}
 		driverInstance.driverRepo.Init()
@@ -62,7 +63,7 @@ func (t *DriverService) UpdateDriverStatus(uuid string, driver *models.DriverSta
 
 func (t *DriverService) NewTripRequest(req *models.TripRequest) {
 	msg := repositories.Message{
-		MsgType: reflect.TypeOf(repositories.TripRequestType{}),
+		MsgType: reflect.TypeOf(&repositories.TripRequestType{}),
 		Payload: req,
 	}
 	req.Uuid = uuid.New().String()
@@ -71,7 +72,7 @@ func (t *DriverService) NewTripRequest(req *models.TripRequest) {
 
 func (t *DriverService) NewDriverInfo(info *models.DriverInfo) {
 	msg := repositories.Message{
-		MsgType: reflect.TypeOf(repositories.DriverInfoType{}),
+		MsgType: reflect.TypeOf(&repositories.DriverInfoType{}),
 		Payload: info,
 	}
 	t.driverRepo.NewRequest(&msg)
@@ -79,7 +80,7 @@ func (t *DriverService) NewDriverInfo(info *models.DriverInfo) {
 
 func (t *DriverService) NewDriverUpdate(update *models.DriverUpdate) {
 	msg := repositories.Message{
-		MsgType: reflect.TypeOf(repositories.DriverUpdateType{}),
+		MsgType: reflect.TypeOf(&repositories.DriverUpdateType{}),
 		Payload: update,
 	}
 	t.driverRepo.NewRequest(&msg)
@@ -87,7 +88,7 @@ func (t *DriverService) NewDriverUpdate(update *models.DriverUpdate) {
 
 func (t *DriverService) NewDriverQuery(query *models.QueryRequest) {
 	msg := repositories.Message{
-		MsgType: reflect.TypeOf(repositories.DriverQueryType{}),
+		MsgType: reflect.TypeOf(&repositories.DriverQueryType{}),
 		Payload: query,
 	}
 	t.driverRepo.NewRequest(&msg)

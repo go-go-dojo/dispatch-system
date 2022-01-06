@@ -1,18 +1,16 @@
 {
-	"Uuid": "1",
-	"Name": "Andre Motorista",
-	"Ranking": 0.999,
-	"Trips": 0,
-	"Car":
-	{
-		"PlateNumber": "ADC-0123",
-		"Brand": "Volkswagen",
-		"Model": "Fusca"
+	"uuid":"1",
+	"name":"Andre Motorista",
+	"ranking":0.999,
+	"trips":0,
+	"car":{
+		"plateNumber":"ADC-0123",
+		"brand":"Volkswagen",
+		"model":"Fusca"
 	},
-	"Status": 0,
-	"Location":
-	{
-		"Latitude": -51.189573,
-		"Longitude": -30.045988
+	"status":0,
+	"location":{
+		"latitude":-51.189573,
+		"longitude":-30.045988
 	}
 }

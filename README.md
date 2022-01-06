@@ -11,8 +11,17 @@ Uber-like service which dispatches drivers according to client trip requests.
 
 ### Next steps (in no particular order)
 
-- Replace the switch case in driverRepository.handleRequestChannel with a Registry
-- Implement periodic updates to the client upon a successful trip request
+- ~~Unit tests~~
+- ~~Replace the switch case in driverRepository.handleRequestChannel with a Registry~~
+- Periodic updates to the passenger upon a successful trip request
+- Assign a driver to a passenger only upon driver acceptance
+- Mock driver/passenger applications to visualize working application
+
+### Testing
+
+The content of JSON files can be sent via Curl using the following command:
+
+`curl -X POST -H 'Content-Type: application/json' -d "@./driver_info_generic.json" "localhost:8089/api/driver/updateInfo"`
 
 ### 11/11/2021
 
