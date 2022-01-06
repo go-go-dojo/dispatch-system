@@ -37,6 +37,10 @@ func (t *TripRequestType) ProcessPayload(payload interface{}, s *DriverRepositor
 		log.Printf("[TripRequest.ProcessPayload] Error=%s\n", err.Error())
 	}
 	if driver != nil {
+		t := new(models.Trip)
+		t.Status = models.Assigned
+		t.Driver = driver
+
 		s.ResponseCh <- driver
 	}
 }
