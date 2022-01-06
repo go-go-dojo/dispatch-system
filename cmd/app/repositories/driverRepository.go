@@ -53,8 +53,13 @@ func (t *TripRequestType) ProcessPayload(payload interface{}, s *DriverRepositor
 			Driver:   driver,
 		}
 
+		s.add(t)
 		s.ResponseCh <- t
 	}
+}
+
+func (s *DriverRepository) add(trip *models.Trip) {
+	s.trips[trip.Uuid] = trip
 }
 
 func (t *DriverUpdateType) ProcessPayload(payload interface{}, s *DriverRepository) {
@@ -93,6 +98,7 @@ func (t *DriverQueryType) ProcessPayload(payload interface{}, s *DriverRepositor
 
 type DriverRepository struct {
 	drivers map[string]*models.DriverInfo
+	trips   map[string]*models.Trip
 
 	handles map[string]IService
 
