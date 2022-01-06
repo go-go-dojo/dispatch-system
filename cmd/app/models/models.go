@@ -5,7 +5,7 @@ import "fmt"
 type Status int
 
 const (
-	Received = 1
+	Assigned = 1
 	OnTrip
 	TripFinished
 	Cancel
@@ -46,25 +46,23 @@ type TripRequest struct {
 	Datetime string `json:"datetime"`
 	Location Location
 	Uuid     string `json:"uuid"`
-	Status   Status
 }
 
 type TripResponse struct {
 	TripRequest TripRequest
 	Driver      DriverInfo
 	Uuid        string `json:"uuid"`
-	Status      Status
 }
 
 func (tr TripRequest) String() string {
-	return fmt.Sprintf("<TripRequest> Location=%s, id=%s, Status=%d", tr.Location, tr.Uuid, tr.Status)
+	return fmt.Sprintf("<TripRequest> Location=%s, id=%s", tr.Location, tr.Uuid)
 }
 
 type Trip struct {
 	Location Location
 	Uuid     string `json:"uuid"`
 	Status   Status
-	Driver   DriverInfo
+	Driver   *DriverInfo
 }
 
 func (t Trip) String() string {
