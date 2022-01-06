@@ -3,6 +3,7 @@ package repositories
 import (
 	"dispatch-system/models"
 	"dispatch-system/utils"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
@@ -55,6 +56,15 @@ func (t *TripRequestType) ProcessPayload(payload interface{}, s *DriverRepositor
 
 		s.add(t)
 		s.ResponseCh <- t
+
+		// TODO: This is not ideal, the response should not be handled by driverRepository
+		body, err := json.Marshal(*t)
+		if err != nil {
+			log.Printf("[TripRequest.ProcessPayload] Error marshalling trip")
+		}
+		tripRequest.Writer.Header().Set("Content-Type", "application/json")
+		//tripRequest.Writer.WriteHeader(http.StatusOK)
+		tripRequest.Writer.Write(body)
 	}
 }
 
@@ -113,6 +123,7 @@ type DriverRepository struct {
 func (s *DriverRepository) Init() {
 	if s.drivers == nil {
 		s.drivers = make(map[string]*models.DriverInfo)
+		s.trips = make(map[string]*models.Trip)
 		s.requestCh = make(chan *Message)
 		s.ResponseCh = make(chan interface{})
 		s.handles = make(map[string]IService)

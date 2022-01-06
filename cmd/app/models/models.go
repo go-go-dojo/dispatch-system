@@ -1,6 +1,9 @@
 package models
 
-import "fmt"
+import (
+	"fmt"
+	"net/http"
+)
 
 type TripStatus int
 
@@ -46,12 +49,7 @@ type TripRequest struct {
 	Datetime string `json:"datetime"`
 	Location Location
 	Uuid     string `json:"uuid"`
-}
-
-type TripResponse struct {
-	TripRequest TripRequest
-	Driver      DriverInfo
-	Uuid        string `json:"uuid"`
+	Writer   http.ResponseWriter
 }
 
 func (tr TripRequest) String() string {

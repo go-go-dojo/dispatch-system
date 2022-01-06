@@ -135,6 +135,7 @@ func (app *application) requestTrip(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	req.Writer = w
 	fmt.Println("[application.requestTrip] Created new request ", req)
 	services.GetDriverService().NewTripRequest(&req)
 }
