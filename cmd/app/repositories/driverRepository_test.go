@@ -98,15 +98,14 @@ func TestDriverRepository_ProcessTripRequestEmptyDriver(t *testing.T) {
 			Latitude:  0,
 			Longitude: 0,
 		},
-		Uuid:   "",
-		Status: 0,
+		Uuid: "",
 	}}
 
 	s := new(DriverRepository)
 	s.Init()
 
 	for _, req := range requests {
-		_, err := s.ProcessTripRequest(req)
+		_, err := s.FindClosestDriver(req)
 
 		if err == nil {
 			t.Fatalf("Error expected because there are not drivers")
@@ -125,16 +124,14 @@ func TestDriverRepository_ProcessTripRequest(t *testing.T) {
 			Latitude:  0.1,
 			Longitude: 0.1,
 		},
-		Uuid:   "",
-		Status: 0,
+		Uuid: "",
 	}, {
 		Datetime: "",
 		Location: models.Location{
 			Latitude:  0.5,
 			Longitude: 0.5,
 		},
-		Uuid:   "",
-		Status: 0,
+		Uuid: "",
 	}}
 
 	drivers := []*models.DriverInfo{{
@@ -187,7 +184,7 @@ func TestDriverRepository_ProcessTripRequest(t *testing.T) {
 	}
 
 	for _, req := range requests {
-		if d, err := s.ProcessTripRequest(req); err == nil {
+		if d, err := s.FindClosestDriver(req); err == nil {
 			closestDrivers = append(closestDrivers, d)
 		}
 	}

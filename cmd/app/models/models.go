@@ -2,7 +2,7 @@ package models
 
 import "fmt"
 
-type Status int
+type TripStatus int
 
 const (
 	Assigned = 1
@@ -61,10 +61,10 @@ func (tr TripRequest) String() string {
 type Trip struct {
 	Location Location
 	Uuid     string `json:"uuid"`
-	Status   Status
+	Status   TripStatus
 	Driver   *DriverInfo
 }
 
 func (t Trip) String() string {
-	return fmt.Sprintf("<Trip> Location=%s; id=%s; Status=%d; DriverInfo=%s\n", t.Location, t.Uuid, t.Status, t.Driver.Name)
+	return fmt.Sprintf("<Trip> Location=%s; id=%s; TripStatus=%d; DriverInfo=%s\n", t.Location, t.Uuid, t.Status, t.Driver.Name)
 }

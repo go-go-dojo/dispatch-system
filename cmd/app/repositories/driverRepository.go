@@ -32,16 +32,28 @@ type DriverQueryType struct {
 }
 
 func (t *TripRequestType) ProcessPayload(payload interface{}, s *DriverRepository) {
-	driver, err := s.ProcessTripRequest(payload.(*models.TripRequest))
+
+	tripRequest, ok := payload.(*models.TripRequest)
+
+	if !ok {
+		log.Printf("[TripRequestType.ProcessPayload] Wrong struct type!")
+		// TODO: Add error to the response channel
+		return
+	}
+
+	driver, err := s.FindClosestDriver(tripRequest)
 	if err != nil {
 		log.Printf("[TripRequest.ProcessPayload] Error=%s\n", err.Error())
 	}
 	if driver != nil {
-		t := new(models.Trip)
-		t.Status = models.Assigned
-		t.Driver = driver
+		t := &models.Trip{
+			Location: tripRequest.Location,
+			Uuid:     uuid.New().String(),
+			Status:   models.Assigned,
+			Driver:   driver,
+		}
 
-		s.ResponseCh <- driver
+		s.ResponseCh <- t
 	}
 }
 
@@ -155,7 +167,7 @@ func (s *DriverRepository) handleRequest(req *Message) {
 	}
 }
 
-func (s *DriverRepository) ProcessTripRequest(req *models.TripRequest) (*models.DriverInfo, error) {
+func (s *DriverRepository) FindClosestDriver(req *models.TripRequest) (*models.DriverInfo, error) {
 	var dist, lowestDist float64
 	var closestDriver *models.DriverInfo
 
@@ -164,7 +176,7 @@ func (s *DriverRepository) ProcessTripRequest(req *models.TripRequest) (*models.
 	for _, driver := range s.drivers {
 		if driver.IsAvailable() {
 			dist = utils.DistanceBetween(req.Location, driver.Location)
-			fmt.Printf("[DriverRepo.ProcessTripRequest] Assessing distance=%.3f, driver=%s\n", dist, *driver)
+			fmt.Printf("[DriverRepo.FindClosestDriver] Assessing distance=%.3f, driver=%s\n", dist, *driver)
 			if dist < lowestDist || first {
 				first = false
 				lowestDist = dist
@@ -174,38 +186,9 @@ func (s *DriverRepository) ProcessTripRequest(req *models.TripRequest) (*models.
 	}
 
 	if closestDriver != nil {
-		fmt.Printf("[DriverRepository.ProcessTripRequest] Found driver=%s at distance=%.2f for request=%s\n", *closestDriver, lowestDist, *req)
+		fmt.Printf("[DriverRepository.FindClosestDriver] Found driver=%s at distance=%.2f for request=%s\n", *closestDriver, lowestDist, *req)
 		return closestDriver, nil
 	} else {
 		return nil, errors.New("drivers unavailable")
-	}
-}
-
-func (s *DriverRepository) findDriverBy(req *models.TripRequest) error {
-
-	var dist, lowestDist float64
-	var closestDriver *models.DriverInfo
-
-	// TODO: Use a parallel for loop to find the closest driver
-	first := true
-	for _, driver := range s.drivers {
-		if driver.IsAvailable() {
-			dist = utils.DistanceBetween(req.Location, driver.Location)
-			fmt.Printf("[DriverRepo.ProcessTripRequest] Assessing distance=%.3f, driver=%s\n", dist, *driver)
-			if dist < lowestDist || first {
-				first = false
-				lowestDist = dist
-				closestDriver = driver
-			}
-		}
-	}
-
-	if closestDriver != nil {
-		fmt.Printf("[DriverRepository.ProcessTripRequest] Found driver=%s at distance=%.2f for request=%s\n", *closestDriver, lowestDist, *req)
-		closestDriver.Status = models.ON_TRIP
-		s.ResponseCh <- closestDriver
-		return nil
-	} else {
-		return errors.New("drivers unavailable")
 	}
 }
