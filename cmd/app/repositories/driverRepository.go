@@ -3,11 +3,11 @@ package repositories
 import (
 	"dispatch-system/models"
 	"dispatch-system/utils"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
 	"log"
+	"net/http"
 	"reflect"
 )
 
@@ -57,14 +57,12 @@ func (t *TripRequestType) ProcessPayload(payload interface{}, s *DriverRepositor
 		s.ResponseCh <- t
 		s.trips[t.Uuid] = t
 
-		// TODO: This is not ideal, the response should not be handled by driverRepository
-		body, err := json.Marshal(*t)
+		err = tripRequest.Context.JSON(http.StatusOK, t.Uuid)
 		if err != nil {
-			log.Printf("[TripRequest.ProcessPayload] Error marshalling trip")
+			log.Printf("[TripRequestType] err=%s\n", err.Error())
 		}
-		tripRequest.Writer.Header().Set("Content-Type", "application/json")
-		//tripRequest.Writer.WriteHeader(http.StatusOK)
-		tripRequest.Writer.Write(body)
+
+		// TODO: Return t.Uuid to the client
 	}
 }
 

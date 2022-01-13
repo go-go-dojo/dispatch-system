@@ -1,58 +1,54 @@
 package main
 
 import (
+	"dispatch-system/models"
+	"dispatch-system/services"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"net/http"
-
-	"dispatch-system/models"
-	"dispatch-system/services"
+	"github.com/labstack/echo/v4"
 )
 
-func (app *application) updateDriverInfo(w http.ResponseWriter, r *http.Request) {
+func updateDriverInfo(c echo.Context) error {
 
 	var driver models.DriverInfo
 
-	if err := json.NewDecoder(r.Body).Decode(&driver); err != nil {
-		app.serverError(w, errors.New("error decoding driver info update"))
-		return
+	if err := json.NewDecoder(c.Request().Body).Decode(&driver); err != nil {
+		return errors.New("error decoding driver info update")
 	}
 
 	services.GetDriverService().NewDriverInfo(&driver)
+	return nil
 }
 
-func (app *application) updateDriver(w http.ResponseWriter, r *http.Request) {
+func updateDriver(c echo.Context) error {
 
 	var update models.DriverUpdate
 
-	if err := json.NewDecoder(r.Body).Decode(&update); err != nil {
-		app.serverError(w, errors.New("error decoding driver location/status update"))
-		return
+	if err := json.NewDecoder(c.Request().Body).Decode(&update); err != nil {
+		return errors.New("error decoding driver location/status update")
 	}
 
 	services.GetDriverService().NewDriverUpdate(&update)
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	//w.Write()
+	return nil
 }
 
-func (app *application) requestTrip(w http.ResponseWriter, r *http.Request) {
+func requestTrip(c echo.Context) error {
 
 	var req models.TripRequest
 	// TODO: Decode does not return error when the parameters in the json do not correspond to the TripRequest struct
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		app.serverError(w, err)
-		return
+	if err := json.NewDecoder(c.Request().Body).Decode(&req); err != nil {
+		return err
 	}
+	req.Context = c
 
-	req.Writer = w
 	fmt.Println("[application.requestTrip] Created new request ", req)
 	services.GetDriverService().NewTripRequest(&req)
+	return nil
 }
 
-func (app *application) findTrip(w http.ResponseWriter, r *http.Request) {
+func findTrip(c echo.Context) error {
 
 	panic("[application.findTrip] Not yet implemented")
+	return nil
 }

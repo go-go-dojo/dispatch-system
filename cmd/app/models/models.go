@@ -1,8 +1,6 @@
 package models
 
-import (
-	"net/http"
-)
+import "github.com/labstack/echo/v4"
 
 type TripStatus int
 
@@ -40,7 +38,7 @@ type TripRequest struct {
 	Datetime string `json:"datetime"`
 	Location Location
 	Uuid     string `json:"uuid"`
-	Writer   http.ResponseWriter
+	Context  echo.Context
 }
 
 type Trip struct {
