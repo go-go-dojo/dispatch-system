@@ -29,38 +29,6 @@ func GetDriverService() *DriverService {
 	return driverInstance
 }
 
-func (t *DriverService) AddNewDriver(driver *models.DriverInfo) (models.DriverInfo, error) {
-
-	return models.DriverInfo{
-		Uuid:    uuid.New().String(),
-		Name:    "",
-		Ranking: 0,
-		Trips:   0,
-		Car:     models.Car{},
-		Status:  0,
-	}, nil
-}
-
-func (t *DriverService) AddNewLocation(uuid string, driver *models.Location) (models.Location, error) {
-
-	return models.Location{
-		Latitude:  0,
-		Longitude: 0,
-	}, nil
-}
-
-func (t *DriverService) UpdateDriverStatus(uuid string, driver *models.DriverStatus) (models.DriverInfo, error) {
-
-	return models.DriverInfo{
-		Uuid:    "",
-		Name:    "",
-		Ranking: 0,
-		Trips:   0,
-		Car:     models.Car{},
-		Status:  0,
-	}, nil
-}
-
 func (t *DriverService) NewTripRequest(req *models.TripRequest) {
 	msg := repositories.Message{
 		MsgType: reflect.TypeOf(&repositories.TripRequestType{}),
@@ -82,14 +50,6 @@ func (t *DriverService) NewDriverUpdate(update *models.DriverUpdate) {
 	msg := repositories.Message{
 		MsgType: reflect.TypeOf(&repositories.DriverUpdateType{}),
 		Payload: update,
-	}
-	t.driverRepo.NewRequest(&msg)
-}
-
-func (t *DriverService) NewDriverQuery(query *models.QueryRequest) {
-	msg := repositories.Message{
-		MsgType: reflect.TypeOf(&repositories.DriverQueryType{}),
-		Payload: query,
 	}
 	t.driverRepo.NewRequest(&msg)
 }

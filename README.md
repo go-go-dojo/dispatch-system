@@ -14,8 +14,9 @@ Uber-like service which dispatches drivers according to client trip requests.
 - ~~Unit tests~~
 - ~~Replace the switch case in driverRepository.handleRequestChannel with a Registry~~
 - Periodic updates to the passenger upon a successful trip request
-- Assign a driver to a passenger only upon driver acceptance
 - Mock driver/passenger applications to visualize working application
+
+? Assign a driver to a passenger only upon driver acceptance
 
 ### Testing
 

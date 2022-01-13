@@ -54,8 +54,8 @@ func (t *TripRequestType) ProcessPayload(payload interface{}, s *DriverRepositor
 			Driver:   driver,
 		}
 
-		s.add(t)
 		s.ResponseCh <- t
+		s.trips[t.Uuid] = t
 
 		// TODO: This is not ideal, the response should not be handled by driverRepository
 		body, err := json.Marshal(*t)
@@ -66,14 +66,6 @@ func (t *TripRequestType) ProcessPayload(payload interface{}, s *DriverRepositor
 		//tripRequest.Writer.WriteHeader(http.StatusOK)
 		tripRequest.Writer.Write(body)
 	}
-}
-
-func (s *DriverRepository) add(trip *models.Trip) {
-	s.trips[trip.Uuid] = trip
-}
-
-func (s *DriverRepository) findBy(uuid string) (*models.Trip, error) {
-	return nil, nil
 }
 
 func (t *DriverUpdateType) ProcessPayload(payload interface{}, s *DriverRepository) {
@@ -175,7 +167,6 @@ func (s *DriverRepository) RegisterService(service IService) error {
 }
 
 func (s *DriverRepository) NewRequest(msg *Message) {
-
 	s.requestCh <- msg
 }
 

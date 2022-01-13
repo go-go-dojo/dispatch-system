@@ -1,7 +1,6 @@
 package models
 
 import (
-	"fmt"
 	"log"
 )
 
@@ -38,16 +37,8 @@ func (d *DriverInfo) Update(update DriverUpdate) {
 	log.Printf("[DriverInfo.Update] Updated driver %s, status=%d, location=%v\n", d.Uuid, d.Status, d.Location)
 }
 
-func (d DriverInfo) String() string {
-	return fmt.Sprintf("<DriverInfo> id=%s; Status=%d; Name=%s; Location=[%s]; Car=[%s]", d.Uuid, d.Status, d.Name, d.Location, d.Car)
-}
-
 type DriverUpdate struct {
 	Uuid     string
 	Status   DriverStatus
 	Location Location
-}
-
-func (du DriverUpdate) String() string {
-	return fmt.Sprintf("<DriverUpdate> Status=%d; Location=%s", du.Status, du.Location)
 }
