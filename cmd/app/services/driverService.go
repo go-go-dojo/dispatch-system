@@ -23,7 +23,6 @@ func GetDriverService() *DriverService {
 		driverInstance = &DriverService{}
 		driverInstance.driverRepo.Init()
 		go driverInstance.handleDriverRepositoryResponse()
-		go driverInstance.driverRepo.HandleRequestChannel()
 	})
 
 	return driverInstance

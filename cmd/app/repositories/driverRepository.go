@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"reflect"
+	"sync"
 )
 
 type Message struct {
@@ -106,15 +107,15 @@ type DriverRepository struct {
 
 	handles map[string]IService
 
-	requestCh  chan *Message
 	ResponseCh chan interface{}
+
+	repositoryMutex sync.Mutex
 }
 
 func (s *DriverRepository) Init() {
 	if s.drivers == nil {
 		s.drivers = make(map[string]*models.DriverInfo)
 		s.trips = make(map[string]*models.Trip)
-		s.requestCh = make(chan *Message)
 		s.ResponseCh = make(chan interface{})
 		s.handles = make(map[string]IService)
 	}
@@ -141,16 +142,9 @@ func (s *DriverRepository) Init() {
 
 }
 
-func (s *DriverRepository) HandleRequestChannel() {
-	for req := range s.requestCh {
-		s.handleRequest(req)
-	}
-}
-
 func (s *DriverRepository) Shutdown() {
 	// Close request and response channel
 	fmt.Println("[DriverRepository.Shutdown] Begin")
-	close(s.requestCh)
 	close(s.ResponseCh)
 }
 
@@ -165,7 +159,9 @@ func (s *DriverRepository) RegisterService(service IService) error {
 }
 
 func (s *DriverRepository) NewRequest(msg *Message) {
-	s.requestCh <- msg
+	s.repositoryMutex.Lock()
+	s.handleRequest(msg)
+	s.repositoryMutex.Unlock()
 }
 
 func (s *DriverRepository) handleRequest(req *Message) {
