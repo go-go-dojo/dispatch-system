@@ -4,7 +4,6 @@ import (
 	"dispatch-system/models"
 	"dispatch-system/repositories"
 	"fmt"
-	"reflect"
 	"sync"
 
 	"github.com/google/uuid"
@@ -28,29 +27,17 @@ func GetDriverService() *DriverService {
 	return driverInstance
 }
 
-func (t *DriverService) NewTripRequest(req *models.TripRequest) {
-	msg := repositories.Message{
-		MsgType: reflect.TypeOf(&repositories.TripRequestType{}),
-		Payload: req,
-	}
+func (t *DriverService) NewTripRequest(req *models.TripRequest) (interface{}, error) {
 	req.Uuid = uuid.New().String()
-	t.driverRepo.NewRequest(&msg)
+	return t.driverRepo.NewRequest(req)
 }
 
 func (t *DriverService) NewDriverInfo(info *models.DriverInfo) {
-	msg := repositories.Message{
-		MsgType: reflect.TypeOf(&repositories.DriverInfoType{}),
-		Payload: info,
-	}
-	t.driverRepo.NewRequest(&msg)
+	t.driverRepo.NewRequest(info)
 }
 
 func (t *DriverService) NewDriverUpdate(update *models.DriverUpdate) {
-	msg := repositories.Message{
-		MsgType: reflect.TypeOf(&repositories.DriverUpdateType{}),
-		Payload: update,
-	}
-	t.driverRepo.NewRequest(&msg)
+	t.driverRepo.NewRequest(update)
 }
 
 func (t *DriverService) handleDriverRepositoryResponse() {

@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/labstack/echo/v4"
+	"net/http"
 )
 
 func updateDriverInfo(c echo.Context) error {
@@ -40,11 +41,16 @@ func requestTrip(c echo.Context) error {
 	if err := json.NewDecoder(c.Request().Body).Decode(&req); err != nil {
 		return err
 	}
-	req.Context = c
 
 	fmt.Println("[application.requestTrip] Created new request ", req)
-	services.GetDriverService().NewTripRequest(&req)
-	return nil
+	res, err := services.GetDriverService().NewTripRequest(&req)
+
+	if err != nil {
+		return c.String(http.StatusOK, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, res)
+
 }
 
 func findTrip(c echo.Context) error {

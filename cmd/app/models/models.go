@@ -1,11 +1,9 @@
 package models
 
-import "github.com/labstack/echo/v4"
-
 type TripStatus int
 
 const (
-	Assigned = 1
+	Assigned = iota
 	OnTrip
 	TripFinished
 	Cancel
@@ -38,7 +36,6 @@ type TripRequest struct {
 	Datetime string `json:"datetime"`
 	Location Location
 	Uuid     string `json:"uuid"`
-	Context  echo.Context
 }
 
 type Trip struct {

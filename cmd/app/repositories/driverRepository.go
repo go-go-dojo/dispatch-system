@@ -7,68 +7,35 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"log"
-	"net/http"
 	"reflect"
 	"sync"
 )
 
-type Message struct {
-	MsgType reflect.Type
-	Payload interface{}
-}
-
-type IService interface {
-	ProcessPayload(payload interface{}, s *DriverRepository)
-}
-
-type TripRequestType struct {
-}
-
-type DriverUpdateType struct {
-}
-
-type DriverInfoType struct {
-}
-
-type DriverQueryType struct {
-}
-
-func (t *TripRequestType) ProcessPayload(payload interface{}, s *DriverRepository) {
-
-	tripRequest, ok := payload.(*models.TripRequest)
-
-	if !ok {
-		log.Printf("[TripRequestType.ProcessPayload] Wrong struct type!")
-		// TODO: Add error to the response channel
-		return
-	}
+func (s *DriverRepository) ProcessTripRequest(tripRequest *models.TripRequest) (*models.Trip, error) {
 
 	driver, err := s.FindClosestDriver(tripRequest)
 	if err != nil {
 		log.Printf("[TripRequest.ProcessPayload] Error=%s\n", err.Error())
+		return &models.Trip{}, errors.New("could not find closes driver for request")
 	}
-	if driver != nil {
-		t := &models.Trip{
-			Location: tripRequest.Location,
-			Uuid:     uuid.New().String(),
-			Status:   models.Assigned,
-			Driver:   driver,
-		}
 
-		s.ResponseCh <- t
-		s.trips[t.Uuid] = t
-
-		err = tripRequest.Context.JSON(http.StatusOK, t.Uuid)
-		if err != nil {
-			log.Printf("[TripRequestType] err=%s\n", err.Error())
-		}
-
-		// TODO: Return t.Uuid to the client
+	if driver == nil {
+		return &models.Trip{}, errors.New("no driver available")
 	}
+
+	driver.Status = models.ON_TRIP
+
+	t := &models.Trip{
+		Location: tripRequest.Location,
+		Uuid:     uuid.New().String(),
+		Status:   models.Assigned,
+		Driver:   driver,
+	}
+	s.trips[t.Uuid] = t
+	return t, nil
 }
 
-func (t *DriverUpdateType) ProcessPayload(payload interface{}, s *DriverRepository) {
-	update := payload.(*models.DriverUpdate)
+func (s *DriverRepository) ProcessDriverUpdate(update *models.DriverUpdate) {
 	if driver, ok := s.drivers[update.Uuid]; ok {
 		driver.Update(*update)
 	} else {
@@ -76,8 +43,7 @@ func (t *DriverUpdateType) ProcessPayload(payload interface{}, s *DriverReposito
 	}
 }
 
-func (t *DriverInfoType) ProcessPayload(payload interface{}, s *DriverRepository) {
-	newDriver := payload.(*models.DriverInfo)
+func (s *DriverRepository) ProcessDriverInfo(newDriver *models.DriverInfo) {
 	if driver, ok := s.drivers[newDriver.Uuid]; ok && (newDriver.Uuid != "") {
 		// Due to this simplification, new drivers are able to override other driver's information
 		fmt.Printf("[DriverRepository.ProcessDriverInfo] DriverInfo updated, %s\n", *driver)
@@ -92,8 +58,7 @@ func (t *DriverInfoType) ProcessPayload(payload interface{}, s *DriverRepository
 	}
 }
 
-func (t *DriverQueryType) ProcessPayload(payload interface{}, s *DriverRepository) {
-	query := payload.(models.QueryRequest)
+func (s *DriverRepository) ProcessDriverQuery(query *models.QueryRequest) {
 	if driver, ok := s.drivers[query.Uuid]; ok {
 		fmt.Printf("[DriverRepository.ProcessDriverQuery] Driver info=%s\n", driver)
 	} else {
@@ -105,8 +70,6 @@ type DriverRepository struct {
 	drivers map[string]*models.DriverInfo
 	trips   map[string]*models.Trip
 
-	handles map[string]IService
-
 	ResponseCh chan interface{}
 
 	repositoryMutex sync.Mutex
@@ -117,29 +80,7 @@ func (s *DriverRepository) Init() {
 		s.drivers = make(map[string]*models.DriverInfo)
 		s.trips = make(map[string]*models.Trip)
 		s.ResponseCh = make(chan interface{})
-		s.handles = make(map[string]IService)
 	}
-
-	tripRequestType := &TripRequestType{}
-	if err := s.RegisterService(tripRequestType); err != nil {
-		fmt.Printf("Error at TripRequestType: %s", err.Error())
-	}
-
-	driverUpdateType := &DriverUpdateType{}
-	if err := s.RegisterService(driverUpdateType); err != nil {
-		fmt.Printf("Error at DriverUpdateType: %s", err.Error())
-	}
-
-	driverInfoType := &DriverInfoType{}
-	if err := s.RegisterService(driverInfoType); err != nil {
-		fmt.Printf("Error at DriverInfoType: %s", err.Error())
-	}
-
-	driverQueryType := &DriverQueryType{}
-	if err := s.RegisterService(driverQueryType); err != nil {
-		fmt.Printf("Error at DriverQueryType: %s", err.Error())
-	}
-
 }
 
 func (s *DriverRepository) Shutdown() {
@@ -148,29 +89,29 @@ func (s *DriverRepository) Shutdown() {
 	close(s.ResponseCh)
 }
 
-func (s *DriverRepository) RegisterService(service IService) error {
-
-	name := reflect.TypeOf(service).String()
-	if _, exists := s.handles[name]; exists {
-		return fmt.Errorf("service already exists %s", name)
-	}
-	s.handles[name] = service
-	return nil
-}
-
-func (s *DriverRepository) NewRequest(msg *Message) {
+func (s *DriverRepository) NewRequest(msg interface{}) (interface{}, error) {
 	s.repositoryMutex.Lock()
-	s.handleRequest(msg)
+	res, err := s.handleRequest(msg)
 	s.repositoryMutex.Unlock()
+	return res, err
 }
 
-func (s *DriverRepository) handleRequest(req *Message) {
+func (s *DriverRepository) handleRequest(req interface{}) (interface{}, error) {
 
-	if svc, ok := s.handles[req.MsgType.String()]; ok {
-		svc.ProcessPayload(req.Payload, s)
-	} else {
-		fmt.Printf("Error, MsgType=%s not found\n", req.MsgType)
+	switch req.(type) {
+	case *models.TripRequest:
+		return s.ProcessTripRequest(req.(*models.TripRequest))
+	case *models.DriverUpdate:
+		s.ProcessDriverUpdate(req.(*models.DriverUpdate))
+	case *models.DriverInfo:
+		s.ProcessDriverInfo(req.(*models.DriverInfo))
+	case *models.QueryRequest:
+		s.ProcessDriverQuery(req.(*models.QueryRequest))
+	default:
+		log.Printf("[DriverRepository.handleRequest] invalid struct type %s\n", reflect.TypeOf(req))
 	}
+
+	return nil, nil
 }
 
 func (s *DriverRepository) FindClosestDriver(req *models.TripRequest) (*models.DriverInfo, error) {
