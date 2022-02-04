@@ -1,12 +1,10 @@
 package repositories
 
 import (
+	"dispatch-system/models"
 	"fmt"
 	"github.com/stretchr/testify/require"
-	"reflect"
 	"testing"
-
-	"dispatch-system/models"
 )
 
 func TestDriverRepository_ProcessDriverInfo(t *testing.T) {
@@ -55,13 +53,11 @@ func TestDriverRepository_ProcessDriverInfo(t *testing.T) {
 	s.Init()
 	s.drivers = driverMap
 
-	driverInfoType := &DriverInfoType{}
-	if err := s.RegisterService(driverInfoType); err != nil {
-		t.Error(err)
-	}
-
 	for _, driver := range drivers {
-		s.handleRequest(&Message{Payload: driver, MsgType: reflect.TypeOf(&DriverInfoType{})})
+		_, err := s.handleRequest(driver)
+		if err != nil {
+			t.Error(err)
+		}
 	}
 
 	if d, ok := s.drivers["717995b2-978b"]; ok {
@@ -174,13 +170,11 @@ func TestDriverRepository_ProcessTripRequest(t *testing.T) {
 	s := new(DriverRepository)
 	s.Init()
 
-	driverInfoType := &DriverInfoType{}
-	if err := s.RegisterService(driverInfoType); err != nil {
-		t.Error(err)
-	}
-
 	for _, driver := range drivers {
-		s.handleRequest(&Message{Payload: driver, MsgType: reflect.TypeOf(&DriverInfoType{})})
+		_, err := s.handleRequest(driver)
+		if err != nil {
+			t.Error(err)
+		}
 	}
 
 	for _, req := range requests {

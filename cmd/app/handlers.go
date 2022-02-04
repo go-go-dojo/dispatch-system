@@ -50,7 +50,6 @@ func requestTrip(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, res)
-
 }
 
 func findTrip(c echo.Context) error {

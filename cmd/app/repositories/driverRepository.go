@@ -46,7 +46,7 @@ func (s *DriverRepository) ProcessDriverUpdate(update *models.DriverUpdate) {
 func (s *DriverRepository) ProcessDriverInfo(newDriver *models.DriverInfo) {
 	if driver, ok := s.drivers[newDriver.Uuid]; ok && (newDriver.Uuid != "") {
 		// Due to this simplification, new drivers are able to override other driver's information
-		fmt.Printf("[DriverRepository.ProcessDriverInfo] DriverInfo updated, %s\n", *driver)
+		fmt.Printf("[DriverRepository.ProcessDriverInfo] DriverInfo updated, %v\n", *driver)
 		s.drivers[newDriver.Uuid] = newDriver
 	} else {
 		// New driver, generate unique id
@@ -54,13 +54,13 @@ func (s *DriverRepository) ProcessDriverInfo(newDriver *models.DriverInfo) {
 			newDriver.Uuid = uuid.New().String()
 		}
 		s.drivers[newDriver.Uuid] = newDriver
-		fmt.Printf("[DriverRepository.ProcessDriverInfo] New driver registered, %s\n", *s.drivers[newDriver.Uuid])
+		fmt.Printf("[DriverRepository.ProcessDriverInfo] New driver registered, %v\n", *s.drivers[newDriver.Uuid])
 	}
 }
 
 func (s *DriverRepository) ProcessDriverQuery(query *models.QueryRequest) {
 	if driver, ok := s.drivers[query.Uuid]; ok {
-		fmt.Printf("[DriverRepository.ProcessDriverQuery] Driver info=%s\n", driver)
+		fmt.Printf("[DriverRepository.ProcessDriverQuery] Driver info=%v\n", driver)
 	} else {
 		fmt.Printf("[DriverRepository.ProcessDriverQuery] Could not find driver info for id=%s\n", query.Uuid)
 	}
@@ -123,7 +123,7 @@ func (s *DriverRepository) FindClosestDriver(req *models.TripRequest) (*models.D
 	for _, driver := range s.drivers {
 		if driver.IsAvailable() {
 			dist = utils.DistanceBetween(req.Location, driver.Location)
-			fmt.Printf("[DriverRepo.FindClosestDriver] Assessing distance=%.3f, driver=%s\n", dist, *driver)
+			fmt.Printf("[DriverRepo.FindClosestDriver] Assessing distance=%.3f, driver=%v\n", dist, *driver)
 			if dist < lowestDist || first {
 				first = false
 				lowestDist = dist
@@ -133,7 +133,7 @@ func (s *DriverRepository) FindClosestDriver(req *models.TripRequest) (*models.D
 	}
 
 	if closestDriver != nil {
-		fmt.Printf("[DriverRepository.FindClosestDriver] Found driver=%s at distance=%.2f for request=%s\n", *closestDriver, lowestDist, *req)
+		fmt.Printf("[DriverRepository.FindClosestDriver] Found driver=%v at distance=%.2f for request=%v\n", *closestDriver, lowestDist, *req)
 		return closestDriver, nil
 	} else {
 		return nil, errors.New("drivers unavailable")

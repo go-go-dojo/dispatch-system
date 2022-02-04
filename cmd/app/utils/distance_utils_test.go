@@ -23,7 +23,7 @@ func TestDistanceBetween(t *testing.T) {
 		got := DistanceBetween(table.from, table.to)
 		want := table.dist
 		if got != want {
-			t.Errorf("DistanceBetween(%s, %s), got=%f, want=%f", table.from, table.to, got, want)
+			t.Errorf("DistanceBetween(%v, %v), got=%f, want=%f", table.from, table.to, got, want)
 		}
 	}
 }
