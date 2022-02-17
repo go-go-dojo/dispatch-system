@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/labstack/echo/v4"
+	"log"
 	"net/http"
 )
 
@@ -53,6 +54,13 @@ func requestTrip(c echo.Context) error {
 }
 
 func findTrip(c echo.Context) error {
+
+	tripId := c.Param("uuid")
+	log.Printf("[findTrip] uuid: %s\n", tripId)
+
+	tripQuery := &models.TripQueryRequest{Uuid: tripId}
+
+	res, err := services.GetDriverService().NewTripStatusRequest(tripQuery)
 
 	panic("[application.findTrip] Not yet implemented")
 	return nil

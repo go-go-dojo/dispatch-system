@@ -9,13 +9,6 @@ const (
 	Cancel
 )
 
-type QueryType int
-
-const (
-	DRIVERINFO = iota
-	TRIP
-)
-
 type Location struct {
 	Latitude  float64 `json:"latitude"`
 	Longitude float64 `json:"longitude"`
@@ -27,9 +20,12 @@ type Car struct {
 	Model       string `json:"model"`
 }
 
-type QueryRequest struct {
+type TripQueryRequest struct {
 	Uuid string
-	Type QueryType
+}
+
+type DriverQueryRequest struct {
+	Uuid string
 }
 
 type TripRequest struct {

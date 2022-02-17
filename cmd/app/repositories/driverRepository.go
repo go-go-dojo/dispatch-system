@@ -58,7 +58,7 @@ func (s *DriverRepository) ProcessDriverInfo(newDriver *models.DriverInfo) {
 	}
 }
 
-func (s *DriverRepository) ProcessDriverQuery(query *models.QueryRequest) {
+func (s *DriverRepository) ProcessDriverQuery(query *models.DriverQueryRequest) {
 	if driver, ok := s.drivers[query.Uuid]; ok {
 		fmt.Printf("[DriverRepository.ProcessDriverQuery] Driver info=%v\n", driver)
 	} else {
@@ -105,8 +105,10 @@ func (s *DriverRepository) handleRequest(req interface{}) (interface{}, error) {
 		s.ProcessDriverUpdate(req.(*models.DriverUpdate))
 	case *models.DriverInfo:
 		s.ProcessDriverInfo(req.(*models.DriverInfo))
-	case *models.QueryRequest:
-		s.ProcessDriverQuery(req.(*models.QueryRequest))
+	case *models.DriverQueryRequest:
+		s.ProcessDriverQuery(req.(*models.DriverQueryRequest))
+	case *models.TripQueryRequest:
+		s.ProcessTripQueryRequest(req.(*models.TripQueryRequest))
 	default:
 		log.Printf("[DriverRepository.handleRequest] invalid struct type %s\n", reflect.TypeOf(req))
 	}

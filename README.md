@@ -13,7 +13,7 @@ Uber-like service which dispatches drivers according to client trip requests.
 
 - ~~Unit tests~~
 - ~~Replace the switch case in driverRepository.handleRequestChannel with a Registry~~
-- Replace channel logic with mutexes in DriverRepository so that the server can return to the client via http. This might invalidate the need for the registry pattern previously implemented.
+- ~~Replace channel logic with mutexes in DriverRepository so that the server can return to the client via http. This might invalidate the need for the registry pattern previously implemented.~~
 - Client can request trip updates
 - Mock driver/passenger applications to visualize working application
 

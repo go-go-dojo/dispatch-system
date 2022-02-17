@@ -32,6 +32,11 @@ func (t *DriverService) NewTripRequest(req *models.TripRequest) (interface{}, er
 	return t.driverRepo.NewRequest(req)
 }
 
+// TODO: Refactor these functions which do the same thing
+func (t *DriverService) NewTripStatusRequest(req *models.TripQueryRequest) (interface{}, error) {
+	return t.driverRepo.NewRequest(req)
+}
+
 func (t *DriverService) NewDriverInfo(info *models.DriverInfo) {
 	t.driverRepo.NewRequest(info)
 }
