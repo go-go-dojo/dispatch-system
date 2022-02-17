@@ -25,7 +25,7 @@ The content of JSON files can be sent via Curl using the following command:
 
 **Register a new driver:**
 
-`curl -X POST -H 'Content-Type: application/json' -d "@./driver_info_generic.json" "localhost:8089/api/driver/updateInfo"`
+`curl -X POST -H 'Content-Type: application/json' -d "@./driver_info_generic.json" "localhost:8089/api/driver/setInfo"`
 
 **Update driver status and location**
 
@@ -34,6 +34,10 @@ The content of JSON files can be sent via Curl using the following command:
 **Request trip**
 
 `curl -X POST -H 'Content-Type: application/json' -d "@./trip_request_generic.json" "localhost:8089/api/trips"`
+
+**Request trip information**
+
+`curl -X GET "localhost:8089/api/trips/<uuid>"`
 
 ### 11/11/2021
 

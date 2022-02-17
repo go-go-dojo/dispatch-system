@@ -16,9 +16,8 @@ func main() {
 	e := echo.New()
 	e.POST("/api/trips", requestTrip)
 	e.POST("/api/driver/update", updateDriver)
-	e.POST("/api/driver/updateInfo", updateDriverInfo)
-
-	e.POST("/api/trips/:uuid", findTrip)
+	e.POST("/api/driver/setInfo", setDriverInfo)
+	e.GET("/api/trips/:uuid", findTrip)
 
 	log.Printf("Starting server on %s", *port)
 

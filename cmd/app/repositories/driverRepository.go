@@ -35,15 +35,17 @@ func (s *DriverRepository) ProcessTripRequest(tripRequest *models.TripRequest) (
 	return t, nil
 }
 
-func (s *DriverRepository) ProcessDriverUpdate(update *models.DriverUpdate) {
+func (s *DriverRepository) ProcessDriverUpdate(update *models.DriverUpdate) (models.DriverInfo, error) {
 	if driver, ok := s.drivers[update.Uuid]; ok {
 		driver.Update(*update)
-	} else {
-		fmt.Printf("[DriverRepository.ProcessDriverUpdate] Unknwon driver id=%s\n", update.Uuid)
+		return *driver, nil
 	}
+
+	fmt.Printf("[DriverRepository.ProcessDriverUpdate] Unknwon driver id=%s\n", update.Uuid)
+	return models.DriverInfo{}, errors.New(fmt.Sprintf("unknwon driver id %s", update.Uuid))
 }
 
-func (s *DriverRepository) ProcessDriverInfo(newDriver *models.DriverInfo) {
+func (s *DriverRepository) ProcessDriverInfo(newDriver *models.DriverInfo) (models.DriverInfo, error) {
 	if driver, ok := s.drivers[newDriver.Uuid]; ok && (newDriver.Uuid != "") {
 		// Due to this simplification, new drivers are able to override other driver's information
 		fmt.Printf("[DriverRepository.ProcessDriverInfo] DriverInfo updated, %v\n", *driver)
@@ -56,6 +58,8 @@ func (s *DriverRepository) ProcessDriverInfo(newDriver *models.DriverInfo) {
 		s.drivers[newDriver.Uuid] = newDriver
 		fmt.Printf("[DriverRepository.ProcessDriverInfo] New driver registered, %v\n", *s.drivers[newDriver.Uuid])
 	}
+
+	return *newDriver, nil
 }
 
 func (s *DriverRepository) ProcessTripQueryRequest(query *models.TripQueryRequest) (*models.Trip, error) {
@@ -64,7 +68,7 @@ func (s *DriverRepository) ProcessTripQueryRequest(query *models.TripQueryReques
 		return trip, nil
 	} else {
 		fmt.Printf("[DriverRepository.ProcessTripQueryRequest] Could not find driver info for id=%s\n", query.Uuid)
-		return &models.Trip{}, errors.New(fmt.Sprintf("could not find the trip %s for uuid", query.Uuid))
+		return &models.Trip{}, errors.New(fmt.Sprintf("could not find the trip for uuid %s", query.Uuid))
 	}
 }
 
@@ -104,9 +108,9 @@ func (s *DriverRepository) handleRequest(req interface{}) (interface{}, error) {
 	case *models.TripRequest:
 		return s.ProcessTripRequest(req.(*models.TripRequest))
 	case *models.DriverUpdate:
-		s.ProcessDriverUpdate(req.(*models.DriverUpdate))
+		return s.ProcessDriverUpdate(req.(*models.DriverUpdate))
 	case *models.DriverInfo:
-		s.ProcessDriverInfo(req.(*models.DriverInfo))
+		return s.ProcessDriverInfo(req.(*models.DriverInfo))
 	case *models.DriverQueryRequest:
 		s.ProcessDriverQuery(req.(*models.DriverQueryRequest))
 	case *models.TripQueryRequest:

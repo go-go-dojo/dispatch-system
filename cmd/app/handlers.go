@@ -11,7 +11,7 @@ import (
 	"net/http"
 )
 
-func updateDriverInfo(c echo.Context) error {
+func setDriverInfo(c echo.Context) error {
 
 	var driver models.DriverInfo
 
@@ -19,8 +19,12 @@ func updateDriverInfo(c echo.Context) error {
 		return errors.New("error decoding driver info update")
 	}
 
-	services.GetDriverService().NewDriverInfo(&driver)
-	return nil
+	updatedDriver, err := services.GetDriverService().NewDriverInfo(&driver)
+	if err != nil {
+		return c.String(http.StatusOK, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, updatedDriver)
 }
 
 func updateDriver(c echo.Context) error {
@@ -31,8 +35,12 @@ func updateDriver(c echo.Context) error {
 		return errors.New("error decoding driver location/status update")
 	}
 
-	services.GetDriverService().NewDriverUpdate(&update)
-	return nil
+	updatedDriver, err := services.GetDriverService().NewDriverUpdate(&update)
+	if err != nil {
+		return c.String(http.StatusOK, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, updatedDriver)
 }
 
 func requestTrip(c echo.Context) error {
@@ -62,6 +70,9 @@ func findTrip(c echo.Context) error {
 
 	res, err := services.GetDriverService().NewTripStatusRequest(tripQuery)
 
-	panic("[application.findTrip] Not yet implemented")
-	return nil
+	if err != nil {
+		return c.String(http.StatusOK, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, res)
 }

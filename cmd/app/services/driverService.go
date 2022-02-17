@@ -37,12 +37,12 @@ func (t *DriverService) NewTripStatusRequest(req *models.TripQueryRequest) (inte
 	return t.driverRepo.NewRequest(req)
 }
 
-func (t *DriverService) NewDriverInfo(info *models.DriverInfo) {
-	t.driverRepo.NewRequest(info)
+func (t *DriverService) NewDriverInfo(info *models.DriverInfo) (interface{}, error) {
+	return t.driverRepo.NewRequest(info)
 }
 
-func (t *DriverService) NewDriverUpdate(update *models.DriverUpdate) {
-	t.driverRepo.NewRequest(update)
+func (t *DriverService) NewDriverUpdate(update *models.DriverUpdate) (interface{}, error) {
+	return t.driverRepo.NewRequest(update)
 }
 
 func (t *DriverService) handleDriverRepositoryResponse() {
