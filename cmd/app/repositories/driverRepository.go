@@ -58,11 +58,13 @@ func (s *DriverRepository) ProcessDriverInfo(newDriver *models.DriverInfo) {
 	}
 }
 
-func (s *DriverRepository) ProcessDriverQuery(query *models.DriverQueryRequest) {
-	if driver, ok := s.drivers[query.Uuid]; ok {
-		fmt.Printf("[DriverRepository.ProcessDriverQuery] Driver info=%v\n", driver)
+func (s *DriverRepository) ProcessTripQueryRequest(query *models.TripQueryRequest) (*models.Trip, error) {
+	if trip, ok := s.trips[query.Uuid]; ok {
+		fmt.Printf("[DriverRepository.ProcessTripQueryRequest] Tryp info=%v\n", trip)
+		return trip, nil
 	} else {
-		fmt.Printf("[DriverRepository.ProcessDriverQuery] Could not find driver info for id=%s\n", query.Uuid)
+		fmt.Printf("[DriverRepository.ProcessTripQueryRequest] Could not find driver info for id=%s\n", query.Uuid)
+		return &models.Trip{}, errors.New(fmt.Sprintf("could not find the trip %s for uuid", query.Uuid))
 	}
 }
 
@@ -108,12 +110,20 @@ func (s *DriverRepository) handleRequest(req interface{}) (interface{}, error) {
 	case *models.DriverQueryRequest:
 		s.ProcessDriverQuery(req.(*models.DriverQueryRequest))
 	case *models.TripQueryRequest:
-		s.ProcessTripQueryRequest(req.(*models.TripQueryRequest))
+		return s.ProcessTripQueryRequest(req.(*models.TripQueryRequest))
 	default:
 		log.Printf("[DriverRepository.handleRequest] invalid struct type %s\n", reflect.TypeOf(req))
 	}
 
 	return nil, nil
+}
+
+func (s *DriverRepository) ProcessDriverQuery(query *models.DriverQueryRequest) {
+	if driver, ok := s.drivers[query.Uuid]; ok {
+		fmt.Printf("[DriverRepository.ProcessDriverQuery] Driver info=%v\n", driver)
+	} else {
+		fmt.Printf("[DriverRepository.ProcessDriverQuery] Could not find driver info for id=%s\n", query.Uuid)
+	}
 }
 
 func (s *DriverRepository) FindClosestDriver(req *models.TripRequest) (*models.DriverInfo, error) {
